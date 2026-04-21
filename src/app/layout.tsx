@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Prompt } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -12,9 +12,23 @@ const prompt = Prompt({
   variable: "--font-prompt",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "ตังค์ดี - Tang Dee",
   description: "Personal Finance Management with Simplicity",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ตังค์ดี",
+  },
   icons: {
     icon: "/favicon.png",
     apple: "/apple-icon.png",

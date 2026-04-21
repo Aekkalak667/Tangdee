@@ -1,0 +1,18 @@
+{
+  "name": "ตังค์ดี - Tang Dee",
+  "short_name": "ตังค์ดี",
+  "description": "Personal Finance Management with Simplicity",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/"
+}
