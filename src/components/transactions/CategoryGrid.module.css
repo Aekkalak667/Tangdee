@@ -1,0 +1,97 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--background);
+  border-radius: 2rem;
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.03);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 0.625rem 1.25rem;
+  border-radius: 2rem;
+  border: 1px solid var(--gray-100);
+  background: var(--gray-50);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.activeTab {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.item:active {
+  transform: scale(0.92);
+}
+
+.iconCircle {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--gray-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.selected .iconCircle {
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+}
+
+.label {
+  font-size: 0.7rem;
+  color: var(--gray-500);
+  text-align: center;
+  font-weight: 500;
+}
+
+.selected .label {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+@media (max-width: 380px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

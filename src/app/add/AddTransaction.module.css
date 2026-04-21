@@ -1,0 +1,155 @@
+.container {
+  padding: 1.5rem;
+  padding-bottom: 8rem;
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.walletSelector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.transferContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.transferArrow {
+  color: var(--gray-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walletPill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.walletPill:active {
+  transform: scale(0.95);
+  background-color: var(--gray-100);
+}
+
+.walletIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walletName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+.amountDisplay {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  margin-right: 0.5rem;
+}
+
+.amountInput {
+  background: transparent;
+  border: none;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.04em;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+  outline: none;
+  padding: 0;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.noteInput {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--gray-100);
+  background-color: var(--gray-50);
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.noteInput:focus {
+  background-color: var(--background);
+  border-color: var(--foreground);
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.03);
+}
+
+.saveButton {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1.25rem;
+  border-radius: 2rem;
+  background-color: var(--foreground);
+  color: var(--background);
+  border: none;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
+}
+
+.saveButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.3);
+}
+
+.saveButton:active {
+  transform: translateY(0);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

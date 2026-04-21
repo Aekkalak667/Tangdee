@@ -6,18 +6,24 @@ import {
   getDocs, 
   onSnapshot, 
   orderBy, 
-  Timestamp 
+  Timestamp,
+  runTransaction,
+  doc,
+  serverTimestamp
 } from "firebase/firestore";
 
 export interface Transaction {
   id: string;
   amount: number;
-  type: 'income' | 'expense';
+  type: 'income' | 'expense' | 'transfer';
   date: Date;
   category: string;
   name: string;
   walletId: string;
   uid: string;
+  fromWalletId?: string;
+  toWalletId?: string;
+  note?: string;
 }
 
 export interface DailySummary {
@@ -240,3 +246,117 @@ export const getTransactionsByDate = async (
     } as Transaction;
   });
 };
+
+/**
+ * Adds a new transaction and updates the wallet balance atomically.
+ * 
+ * @param uid User ID
+ * @param txData Transaction data (excluding id and date)
+ */
+export const addTransactionWithUpdate = async (
+  uid: string,
+  txData: Omit<Transaction, 'id' | 'date'>
+) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const walletRef = doc(db, "users", uid, "wallets", txData.walletId);
+      const walletDoc = await transaction.get(walletRef);
+
+      if (!walletDoc.exists()) {
+        throw new Error("Wallet does not exist!");
+      }
+
+      const currentBalance = Number(walletDoc.data().balance) || 0;
+      const amount = Number(txData.amount);
+      const newBalance = txData.type === 'income' 
+        ? currentBalance + amount 
+        : currentBalance - amount;
+
+      // Create a new transaction document reference
+      const txRef = doc(collection(db, "transactions"));
+      
+      // Set transaction data
+      transaction.set(txRef, {
+        ...txData,
+        amount: amount,
+        date: serverTimestamp(),
+      });
+
+      // Update wallet balance
+      transaction.update(walletRef, { balance: newBalance });
+    });
+  } catch (error) {
+    console.error("Error adding transaction with update:", error);
+    throw error;
+  }
+};
+
+/**
+ * Transfers funds between two wallets atomically.
+ * 
+ * @param uid User ID
+ * @param data Transfer data (fromWalletId, toWalletId, amount, note)
+ */
+export const transferFunds = async (
+  uid: string,
+  data: { 
+    fromWalletId: string; 
+    toWalletId: string; 
+    amount: number; 
+    note?: string;
+  }
+) => {
+  const { fromWalletId, toWalletId, amount, note } = data;
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const fromWalletRef = doc(db, "users", uid, "wallets", fromWalletId);
+      const toWalletRef = doc(db, "users", uid, "wallets", toWalletId);
+
+      const fromWalletDoc = await transaction.get(fromWalletRef);
+      const toWalletDoc = await transaction.get(toWalletRef);
+
+      if (!fromWalletDoc.exists()) {
+        throw new Error("Source wallet does not exist!");
+      }
+      if (!toWalletDoc.exists()) {
+        throw new Error("Destination wallet does not exist!");
+      }
+
+      const fromBalance = Number(fromWalletDoc.data().balance) || 0;
+      const toBalance = Number(toWalletDoc.data().balance) || 0;
+
+      if (fromBalance < amount) {
+        throw new Error("Insufficient balance in the source wallet!");
+      }
+
+      const newFromBalance = fromBalance - amount;
+      const newToBalance = toBalance + amount;
+
+      // Create a new transaction document reference
+      const txRef = doc(collection(db, "transactions"));
+      
+      // Set transaction data
+      transaction.set(txRef, {
+        uid,
+        amount,
+        type: 'transfer',
+        fromWalletId,
+        toWalletId,
+        note: note || '',
+        category: 'Transfer',
+        name: `Transfer from ${fromWalletDoc.data().name} to ${toWalletDoc.data().name}`,
+        date: serverTimestamp(),
+        walletId: fromWalletId, // Primary wallet for this record
+      });
+
+      // Update both wallet balances
+      transaction.update(fromWalletRef, { balance: newFromBalance });
+      transaction.update(toWalletRef, { balance: newToBalance });
+    });
+  } catch (error) {
+    console.error("Error transferring funds:", error);
+    throw error;
+  }
+};
+
