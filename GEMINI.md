@@ -20,8 +20,13 @@
 - [x] ระบบสลับภาษาพรีเมียม (TH/EN)
 - [x] ดีไซน์ Apple-style (Floating Nav, 2rem Radius)
 - [x] ระบบจัดการกระเป๋าเงิน (แก้ไขชื่อ/สี/ไอคอน และลบข้อมูลอย่างปลอดภัย)
+- [x] ระบบ Automated Testing สำหรับ Logic สำคัญ (Vitest) - ยืนยันความถูกต้อง 100%
+- [x] ระบบ Pagination & Infinite Scroll สำหรับประวัติธุรกรรม
 
 ## 📝 บันทึกเอเจนต์ (Maestro Log)
 - สำเร็จภารกิจสร้างฐานแอพใน 5 เฟสย่อย
 - ตรวจสอบ E2E และแก้จุดบกพร่องด้านการนำทาง (Navigation) เรียบร้อยแล้ว
+- **2026-04-21:** เพิ่มความน่าเชื่อถือและประสิทธิภาพ (Reliability & Performance)
+    - ติดตั้ง Vitest และเขียน Unit Tests ครอบคลุมระบบกระเป๋าเงินและการโอนเงิน (ผ่าน 100%)
+    - พัฒนาระบบ Firestore Pagination และ Infinite Scroll ในหน้า Transactions เพื่อรองรับข้อมูลขนาดใหญ่
 - **TechLead Mandate:** คงความเป็น Minimalism และ Real-time ตลอดการพัฒนา

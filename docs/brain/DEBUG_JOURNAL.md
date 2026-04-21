@@ -26,3 +26,8 @@
 - **Issue:** Modal โดน Bottom Nav บัง และปุ่มลบกดแล้วไม่ทำงาน
 - **Root Cause:** `z-index` ต่ำเกินไป และ Props ระหว่าง Modal กับ Page ไม่ตรงกัน
 - **Fix:** ปรับ `z-index: 3000` และเชื่อมต่อ `onConfirm` ให้ส่งค่า boolean กลับไปที่ฟังก์ชันลบจริง
+
+### 6. Vitest Firebase Mock TypeError
+- **Issue:** `TypeError: Cannot read properties of undefined (reading 'includes')` ในไฟล์เทสต์
+- **Root Cause:** ฟังก์ชัน `doc()` mock ไว้ให้รับ 3 อาร์กิวเมนต์ แต่ในโค้ดจริงบางจุดส่งแค่ 1 หรือ 2 ตัว (Variadic Arguments)
+- **Fix:** ปรับการเขียน Mock ให้ใช้ `(...args)` และเช็กชนิดข้อมูลของอาร์กิวเมนต์ตัวที่ 2 ก่อนประมวลผลสตริง เพื่อรองรับทุกรูปแบบการเรียกใช้ใน Firebase v10+

@@ -157,7 +157,9 @@
     "search_placeholder": "Search name or category...",
     "save_button": "Save Transaction",
     "from_wallet": "From Wallet",
-    "to_wallet": "To Wallet"
+    "to_wallet": "To Wallet",
+    "scroll_for_more": "Scroll for more",
+    "no_more_data": "No more transactions"
   }
 }
 

@@ -63,6 +63,22 @@
   opacity: 0.9;
 }
 
+.sentinel {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.fetchingMoreLoader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Animation for list items */
 .listEnter {
   animation: slideUp 0.3s ease-out forwards;

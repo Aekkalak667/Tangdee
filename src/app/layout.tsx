@@ -15,6 +15,10 @@ const prompt = Prompt({
 export const metadata: Metadata = {
   title: "ตังค์ดี - Tang Dee",
   description: "Personal Finance Management with Simplicity",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

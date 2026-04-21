@@ -10,6 +10,7 @@ import {
   doc,
   getDocs,
   limit,
+  startAfter,
   writeBatch,
   deleteDoc
 } from "firebase/firestore";
@@ -151,11 +152,48 @@ export const transferFunds = async (uid: string, data: { fromWalletId: string, t
 };
 
 /**
- * ดึงรายการแบบ Real-time พร้อม Filter และ Grouping (ลบ Mock ออก 100%)
+ * Helper สำหรับจัดกลุ่มรายการตามวันที่
+ */
+export const groupTransactions = (docs: any[], search?: string): GroupedTransactions => {
+  const grouped: GroupedTransactions = {};
+
+  docs.forEach(doc => {
+    const data = (typeof doc.data === 'function' ? { id: doc.id, ...doc.data() } : doc) as Transaction;
+    
+    if (search) {
+      const s = search.toLowerCase();
+      const matches = data.name.toLowerCase().includes(s) || data.category.toLowerCase().includes(s);
+      if (!matches) return;
+    }
+
+    const dateStr = data.date.toDate().toISOString().split('T')[0];
+
+    if (!grouped[dateStr]) {
+      grouped[dateStr] = { transactions: [], totalIncome: 0, totalExpense: 0 };
+    }
+
+    grouped[dateStr].transactions.push(data);
+    if (data.type === 'income') grouped[dateStr].totalIncome += data.amount;
+    if (data.type === 'expense') grouped[dateStr].totalExpense += data.amount;
+  });
+
+  return grouped;
+};
+
+/**
+ * ดึงรายการแบบ Real-time พร้อม Filter, Grouping และ Pagination
  */
 export const subscribeToTransactions = (
-  filters: { uid: string, walletId?: string | 'all', month: number, year: number, search?: string },
-  onUpdate: (data: GroupedTransactions) => void
+  filters: { 
+    uid: string, 
+    walletId?: string | 'all', 
+    month: number, 
+    year: number, 
+    search?: string,
+    pageSize?: number,
+    lastVisible?: any
+  },
+  onUpdate: (data: GroupedTransactions, lastDoc: any) => void
 ) => {
   const startOfMonth = new Date(filters.year, filters.month, 1);
   const endOfMonth = new Date(filters.year, filters.month + 1, 0, 23, 59, 59);
@@ -172,32 +210,60 @@ export const subscribeToTransactions = (
     q = query(q, where("walletId", "==", filters.walletId));
   }
 
+  if (filters.lastVisible) {
+    q = query(q, startAfter(filters.lastVisible));
+  }
+
+  if (filters.pageSize) {
+    q = query(q, limit(filters.pageSize));
+  }
+
   return onSnapshot(q, (snapshot) => {
-    const grouped: GroupedTransactions = {};
-
-    snapshot.docs.forEach(doc => {
-      const data = { id: doc.id, ...doc.data() } as Transaction;
-      
-      // ค้นหาข้อความ (Client-side search เนื่องจาก Firestore ทำ Full-text search ไม่ได้ง่ายๆ)
-      if (filters.search) {
-        const search = filters.search.toLowerCase();
-        const matches = data.name.toLowerCase().includes(search) || data.category.toLowerCase().includes(search);
-        if (!matches) return;
-      }
-
-      const dateStr = data.date.toDate().toISOString().split('T')[0];
-
-      if (!grouped[dateStr]) {
-        grouped[dateStr] = { transactions: [], totalIncome: 0, totalExpense: 0 };
-      }
-
-      grouped[dateStr].transactions.push(data);
-      if (data.type === 'income') grouped[dateStr].totalIncome += data.amount;
-      if (data.type === 'expense') grouped[dateStr].totalExpense += data.amount;
-    });
-
-    onUpdate(grouped);
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+    const grouped = groupTransactions(snapshot.docs, filters.search);
+    onUpdate(grouped, lastDoc);
   });
+};
+
+/**
+ * ดึงรายการแบบระบุหน้า (Pagination) - สำหรับ Load More แบบ Static
+ */
+export const getTransactionsPage = async (
+  filters: { 
+    uid: string, 
+    walletId?: string | 'all', 
+    month: number, 
+    year: number, 
+    pageSize: number,
+    lastVisible?: any 
+  }
+) => {
+  const startOfMonth = new Date(filters.year, filters.month, 1);
+  const endOfMonth = new Date(filters.year, filters.month + 1, 0, 23, 59, 59);
+
+  let q = query(
+    collection(db, "transactions"),
+    where("uid", "==", filters.uid),
+    where("date", ">=", Timestamp.fromDate(startOfMonth)),
+    where("date", "<=", Timestamp.fromDate(endOfMonth)),
+    orderBy("date", "desc")
+  );
+
+  if (filters.walletId && filters.walletId !== 'all') {
+    q = query(q, where("walletId", "==", filters.walletId));
+  }
+
+  if (filters.lastVisible) {
+    q = query(q, startAfter(filters.lastVisible));
+  }
+
+  q = query(q, limit(filters.pageSize));
+
+  const snapshot = await getDocs(q);
+  const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+  const transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+
+  return { transactions, lastDoc };
 };
 
 /**
