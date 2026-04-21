@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { createWallet } from '@/services/walletService';
+import { createWallet, WalletData } from '@/services/walletService';
 import CardPreview from '@/components/wallet/CardPreview';
-import WalletForm, { WalletData } from '@/components/wallet/WalletForm';
+import WalletForm from '@/components/wallet/WalletForm';
 import styles from './CreateWallet.module.css';
 
 export default function CreateWalletPage() {

@@ -11,15 +11,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import styles from './WalletForm.module.css';
-
-export interface WalletData {
-  name: string;
-  balance: number;
-  currency: string;
-  type: string;
-  icon: string;
-  color: string;
-}
+import { WalletData } from '@/services/walletService';
 
 interface WalletFormProps {
   data: WalletData;
@@ -154,8 +146,14 @@ const WalletForm: React.FC<WalletFormProps> = ({ data, onChange }) => {
         <input
           type="number"
           name="balance"
-          value={data.balance}
-          onChange={handleChange}
+          value={data.balance === 0 ? '' : data.balance}
+          onChange={(e) => {
+            const val = e.target.value;
+            onChange({
+              ...data,
+              balance: val === '' ? 0 : parseFloat(val)
+            });
+          }}
           placeholder="0.00"
           className={styles.input}
         />

@@ -1,0 +1,76 @@
+.navContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2.5rem);
+  max-width: 480px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 12px;
+  z-index: 1000;
+  border-radius: 2rem;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .navContainer {
+    background: rgba(23, 23, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--gray-400);
+  transition: all 0.2s ease;
+  flex: 1;
+  height: 100%;
+}
+
+.navItemActive {
+  color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  .navItemActive {
+    color: var(--foreground);
+  }
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.addButton {
+  color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  .addButton {
+    color: var(--foreground);
+  }
+}
+
+.addButton .icon {
+  width: 32px;
+  height: 32px;
+}

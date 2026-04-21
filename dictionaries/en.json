@@ -20,7 +20,33 @@
     "subtitle": "Ready to take control of your finances?",
     "create_first_wallet": "Create Your First Wallet"
   },
+  "dashboard": {
+    "total_balance": "Total Balance",
+    "my_wallets": "My Wallets",
+    "add_income": "Income",
+    "add_expense": "Expense",
+    "add_wallet": "Add Wallet",
+    "spending_summary": "Spending Summary",
+    "show_all": "Show All",
+    "no_data": "No data available",
+    "daily_recap": "Daily Recap",
+    "today": "Today",
+    "income": "Income",
+    "expense": "Expense",
+    "days": {
+      "sun": "S",
+      "mon": "M",
+      "tue": "T",
+      "wed": "W",
+      "thu": "T",
+      "fri": "F",
+      "sat": "S"
+    }
+  },
   "wallet": {
+    "title": "Wallets",
+    "add_new": "Add New Wallet",
+    "overview": "Overview",
     "create_title": "Create New Wallet",
     "create_subtitle": "Set up your wallet to start tracking your expenses.",
     "preview_info": "Your wallet will be visible on your dashboard. You can always change these settings later.",
@@ -46,5 +72,22 @@
       "digital": "Digital Wallet",
       "other": "Other"
     }
+  },
+  "nav": {
+    "home": "Home",
+    "transactions": "Transactions",
+    "add": "Add",
+    "wallet": "Wallets",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "language_name": "English",
+    "language_info": "Choose your preferred language for the application.",
+    "about": "About Us",
+    "version": "App Version",
+    "logout_confirm": "Are you sure you want to logout?"
   }
-}
+  }
+

@@ -68,3 +68,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.app-with-nav {
+  /* Padding moved to individual page containers to keep background consistent */
+}

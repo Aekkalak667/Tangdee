@@ -1,0 +1,86 @@
+.container {
+  background-color: var(--background);
+  border-radius: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.03);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.monthName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.dayLabel {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #9ca3af;
+  padding-bottom: 0.25rem;
+}
+
+.dayCell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #4b5563;
+  border-radius: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dayCell:hover {
+  background-color: #f3f4f6;
+}
+
+.today {
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.today:hover {
+  background-color: #2563eb;
+}
+
+.selected {
+  border: 2px solid #3b82f6;
+}
+
+.indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px;
+}
+
+.positive {
+  background-color: #10b981;
+}
+
+.negative {
+  background-color: #ef4444;
+}
+
+.empty {
+  cursor: default;
+}

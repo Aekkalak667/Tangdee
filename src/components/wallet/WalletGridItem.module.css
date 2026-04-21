@@ -1,0 +1,82 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-radius: 2rem;
+  background-color: var(--background);
+  border: 1px solid var(--gray-200);
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  width: 100%;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.active {
+  background-color: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.active:hover {
+  border-color: var(--foreground);
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1.25rem;
+  background-color: var(--gray-50);
+  color: var(--foreground);
+  transition: all 0.3s ease;
+}
+
+.active .iconWrapper {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--background);
+}
+
+.customColor .iconWrapper {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.customColor.active {
+  box-shadow: 0 0 0 4px var(--background), 0 0 0 6px var(--foreground);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 1.125rem;
+  line-height: 1.2;
+  display: block;
+}
+
+.balance {
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.7;
+  display: block;
+}
+
+.active .balance {
+  opacity: 0.8;
+}

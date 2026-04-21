@@ -3,7 +3,8 @@ import { Prompt } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { WalletProvider } from "@/context/WalletContext";
+import NavigationWrapper from "@/components/navigation/NavigationWrapper";
 
 const prompt = Prompt({
   subsets: ["latin", "thai"],
@@ -26,7 +27,11 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <AuthProvider>
-            {children}
+            <WalletProvider>
+              <NavigationWrapper>
+                {children}
+              </NavigationWrapper>
+            </WalletProvider>
           </AuthProvider>
         </LanguageProvider>
       </body>

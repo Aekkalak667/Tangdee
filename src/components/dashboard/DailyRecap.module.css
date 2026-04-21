@@ -1,0 +1,51 @@
+.container {
+  background-color: var(--background);
+  border-radius: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.03);
+}
+
+.title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-bottom: 0.15rem;
+}
+
+.amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.income {
+  color: #10b981;
+}
+
+.expense {
+  color: #ef4444;
+}
+
+.noData {
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 1rem 0;
+}
