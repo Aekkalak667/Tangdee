@@ -52,17 +52,17 @@
 }
 
 .today {
-  background-color: #3b82f6;
+  background-color: #000000;
   color: #ffffff;
   font-weight: 600;
 }
 
 .today:hover {
-  background-color: #2563eb;
+  background-color: #1a1a1a;
 }
 
 .selected {
-  border: 2px solid #3b82f6;
+  border: 2px solid #000000;
 }
 
 .indicator {
