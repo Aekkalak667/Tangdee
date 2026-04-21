@@ -11,3 +11,5 @@
 | 2026-04-21 | Testing Framework | Vitest + Manual Mocks | เลือก Vitest เพราะเร็วและรองรับ ESM/TypeScript ได้ดีมากสำหรับโปรเจกต์ Next.js |
 | 2026-04-21 | Data Fetching | Firestore Pagination (limit/startAfter) | ป้องกันปัญหาคอขวดเมื่อธุรกรรมมีจำนวนมาก (Scale) และลดค่าใช้จ่าย Firestore Reads |
 | 2026-04-21 | UI Component | Intersection Observer (Sentinel) | ใช้ระบบเลื่อนหน้าจออัตโนมัติ (Infinite Scroll) แทนปุ่ม "โหลดเพิ่ม" เพื่อประสบการณ์แบบ Seamless |
+| 2026-04-21 | PWA Configuration | Standalone Mode & Viewport Cover | เพื่อซ่อน UI ของเบราว์เซอร์บน iOS และสร้างประสบการณ์เหมือน Native App อย่างสมบูรณ์ |
+| 2026-04-21 | Page Transitions | Framer Motion (Apple Card Reveal) | เลือกใช้ `template.tsx` คู่กับ `cubic-bezier(0.22, 1, 0.36, 1)` เพื่อความนุ่มนวลแบบ iOS และเร่งด้วย GPU (`will-change`) |

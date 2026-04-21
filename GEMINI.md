@@ -22,6 +22,7 @@
 - [x] ระบบจัดการกระเป๋าเงิน (แก้ไขชื่อ/สี/ไอคอน และลบข้อมูลอย่างปลอดภัย)
 - [x] ระบบ Automated Testing สำหรับ Logic สำคัญ (Vitest) - ยืนยันความถูกต้อง 100%
 - [x] ระบบ Pagination & Infinite Scroll สำหรับประวัติธุรกรรม
+- [x] ยกระดับ UI/UX: PWA Standalone (iOS), Global Page Transitions (Framer Motion), App Loader พรีเมียม, และหน้า About Us
 
 ## 📝 บันทึกเอเจนต์ (Maestro Log)
 - สำเร็จภารกิจสร้างฐานแอพใน 5 เฟสย่อย
@@ -29,4 +30,9 @@
 - **2026-04-21:** เพิ่มความน่าเชื่อถือและประสิทธิภาพ (Reliability & Performance)
     - ติดตั้ง Vitest และเขียน Unit Tests ครอบคลุมระบบกระเป๋าเงินและการโอนเงิน (ผ่าน 100%)
     - พัฒนาระบบ Firestore Pagination และ Infinite Scroll ในหน้า Transactions เพื่อรองรับข้อมูลขนาดใหญ่
+- **2026-04-21:** ยกระดับประสบการณ์ผู้ใช้ (Premium UX/UI)
+    - ติดตั้ง PWA `manifest.json` และ Meta Tags รองรับ Standalone บน iOS
+    - ติดตั้งอนิเมชั่นเปลี่ยนหน้าแบบ "Apple Card Reveal" (Scale + Slide + Fade) ด้วย `template.tsx`
+    - สร้าง `AppLoader` ตีมกระเป๋าเงิน และหน้า About Us สไตล์ Monochrome
+    - แก้บั๊ก Build Error จาก `lucide-react` (อัพเกรดเป็น latest และปรับไอคอน)
 - **TechLead Mandate:** คงความเป็น Minimalism และ Real-time ตลอดการพัฒนา

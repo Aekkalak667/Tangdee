@@ -31,3 +31,8 @@
 - **Issue:** `TypeError: Cannot read properties of undefined (reading 'includes')` ในไฟล์เทสต์
 - **Root Cause:** ฟังก์ชัน `doc()` mock ไว้ให้รับ 3 อาร์กิวเมนต์ แต่ในโค้ดจริงบางจุดส่งแค่ 1 หรือ 2 ตัว (Variadic Arguments)
 - **Fix:** ปรับการเขียน Mock ให้ใช้ `(...args)` และเช็กชนิดข้อมูลของอาร์กิวเมนต์ตัวที่ 2 ก่อนประมวลผลสตริง เพื่อรองรับทุกรูปแบบการเรียกใช้ใน Firebase v10+
+
+### 7. Missing Icons Build Error
+- **Issue:** `Export Github doesn't exist in target module lucide-react`
+- **Root Cause:** เวอร์ชันของ `lucide-react` เก่าเกินไป (`1.8.0`) และมีการถอด Brand Icons ออกในเวอร์ชันใหม่
+- **Fix:** อัพเกรด `lucide-react@latest` และเปลี่ยนการใช้ไอคอนแบรนด์ (Github/Twitter) ไปใช้ไอคอนมาตรฐาน (Globe/Mail/User) เพื่อให้ Build ผ่านและแสดงผลได้คงเส้นคงวา
