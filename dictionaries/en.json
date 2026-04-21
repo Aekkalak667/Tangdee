@@ -7,6 +7,8 @@
     "preview": "Preview",
     "user_fallback": "User",
     "rights_reserved": "All rights reserved.",
+    "search_placeholder": "Search transactions or categories...",
+    "retry": "Retry",
     "error_generic": "Something went wrong. Please try again."
   },
   "auth": {
@@ -88,6 +90,11 @@
     "about": "About Us",
     "version": "App Version",
     "logout_confirm": "Are you sure you want to logout?"
+  },
+  "transactions": {
+    "title": "Transaction History",
+    "no_data": "No transactions found for this period",
+    "search_placeholder": "Search name or category..."
   }
-  }
+}
 

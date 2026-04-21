@@ -1,0 +1,75 @@
+.groupContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    background-color: rgba(10, 10, 10, 0.8);
+    border-bottom: 1px solid var(--gray-100);
+  }
+}
+
+.date {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.summary {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem; /* 2rem radius system */
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.incomeBadge {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.expenseBadge {
+  background-color: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.itemsContainer {
+  background-color: var(--background);
+  overflow: hidden;
+}
+
+/* If we want the whole group to be a card with 2rem radius */
+.cardStyle {
+  border-radius: 2rem;
+  border: 1px solid var(--gray-100);
+  margin: 0 1rem 1.5rem 1rem;
+  overflow: hidden;
+}
+
+.cardStyle .header {
+  position: relative; /* Not sticky if inside a card usually, or sticky within card bounds */
+  background-color: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+}
