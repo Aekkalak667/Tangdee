@@ -80,3 +80,65 @@
 .active .balance {
   opacity: 0.8;
 }
+
+.manageMode {
+  cursor: default;
+}
+
+.manageMode:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.manageOverlay {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.manageButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(8px);
+}
+
+.manageButton:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.manageButton:active {
+  transform: scale(0.95);
+}
+
+.deleteButton:hover {
+  background-color: #ef4444;
+}
+
+/* For non-custom color cards in manage mode */
+.card:not(.customColor) .manageButton {
+  background-color: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.card:not(.customColor) .manageButton:hover {
+  background-color: var(--gray-200);
+  color: var(--foreground);
+}
+
+.card:not(.customColor) .deleteButton:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}

@@ -9,7 +9,9 @@ import {
   runTransaction, 
   doc,
   getDocs,
-  limit
+  limit,
+  writeBatch,
+  deleteDoc
 } from "firebase/firestore";
 import { db } from "@/lib/firebase.config";
 
@@ -42,6 +44,31 @@ export interface MonthlySummary {
     totalExpense: number;
   };
 }
+
+/**
+ * ลบรายการทั้งหมดที่ผูกกับกระเป๋าเงินที่ระบุ
+ */
+export const deleteAllTransactionsByWallet = async (uid: string, walletId: string) => {
+  try {
+    const q = query(
+      collection(db, "transactions"),
+      where("uid", "==", uid),
+      where("walletId", "==", walletId)
+    );
+
+    const snapshot = await getDocs(q);
+    const batch = writeBatch(db);
+
+    snapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+  } catch (error) {
+    console.error("Error deleting transactions by wallet:", error);
+    throw error;
+  }
+};
 
 /**
  * บันทึกรายการใหม่และอัปเดตยอดเงินในกระเป๋า (Atomic)

@@ -16,3 +16,13 @@
 - **Issue:** แถบเมนูล่างทับปุ่มสำคัญ
 - **Root Cause:** ลืมใส่ Padding-bottom ในคอนเทนเนอร์หลักของแต่ละหน้า
 - **Fix:** เพิ่ม `padding-bottom: 8rem` ให้กับทุกหน้าที่มีระบบนำทาง
+
+### 4. Nested Button Error
+- **Issue:** `In HTML, <button> cannot be a descendant of <button>`
+- **Root Cause:** ใส่ปุ่มแก้ไข/ลบ ซ้อนไว้ในการ์ดที่เป็นปุ่ม
+- **Fix:** เปลี่ยนตัวหุ้มการ์ดจาก `<button>` เป็น `<div>` พร้อมจัดการ Accessibility
+
+### 5. Modal Z-Index & Logic Wiring
+- **Issue:** Modal โดน Bottom Nav บัง และปุ่มลบกดแล้วไม่ทำงาน
+- **Root Cause:** `z-index` ต่ำเกินไป และ Props ระหว่าง Modal กับ Page ไม่ตรงกัน
+- **Fix:** ปรับ `z-index: 3000` และเชื่อมต่อ `onConfirm` ให้ส่งค่า boolean กลับไปที่ฟังก์ชันลบจริง

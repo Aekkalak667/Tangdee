@@ -12,6 +12,7 @@
 - [[DEBUG_JOURNAL]] - บันทึกการแก้บั๊กที่เคยพบ
 
 ## 📍 Current State (2026-04-21)
-- ระบบหลัก (Auth, Dashboard, Wallets, Transactions, Add/Transfer) ทำงานได้สมบูรณ์แบบบนข้อมูลจริง (Real-time Firestore)
-- รองรับ 2 ภาษา (TH/EN) พร้อมระบบจำภาษาล่าสุด
-- รองรับการโอนเงินระหว่างกระเป๋าแบบ Atomic Transaction
+- **[NEW] Wallet Management:** ระบบแก้ไขและลบกระเป๋าเงินเสร็จสมบูรณ์ 100%
+- ระบบหลัก (Auth, Dashboard, Wallets, Transactions, Add/Transfer) ทำงานแบบ Real-time Firestore
+- รองรับ 2 ภาษา (TH/EN) และ Atomic Transactions สำหรับการโอนเงิน
+- ดีไซน์ Apple-style (Floating Nav, Bottom Sheets, Premium Rounding)

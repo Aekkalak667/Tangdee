@@ -95,6 +95,10 @@
   },
   "wallet": {
     "title": "Wallets",
+    "manage": "Manage",
+    "done": "Done",
+    "edit_title": "Edit Wallet",
+    "save_changes": "Save Changes",
     "add_new": "Add New Wallet",
     "overview": "Overview",
     "create_title": "Create New Wallet",
@@ -122,7 +126,14 @@
       "investment": "Investment",
       "digital": "Digital Wallet",
       "other": "Other"
-    }
+    },
+    "delete_title": "Delete Wallet?",
+    "delete_description": "Are you sure you want to delete {name}? This action cannot be undone.",
+    "delete_only": "Delete Wallet Only",
+    "delete_only_subtitle": "Keep transaction history in reports",
+    "delete_all": "Delete Wallet and all Transactions",
+    "delete_all_subtitle": "Recommended for a clean start",
+    "cancel": "Cancel"
   },
   "nav": {
     "home": "Home",

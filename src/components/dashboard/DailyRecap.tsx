@@ -2,12 +2,12 @@
 
 import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { DailySummary } from "@/services/transactionService";
+import { MonthlySummary } from "@/services/transactionService";
 import styles from "./DailyRecap.module.css";
 
 interface DailyRecapProps {
   date: string;
-  summary?: DailySummary;
+  summary?: MonthlySummary[string];
 }
 
 const DailyRecap: React.FC<DailyRecapProps> = ({ date, summary }) => {

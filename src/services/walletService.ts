@@ -1,5 +1,15 @@
 import { db } from "@/lib/firebase.config";
-import { collection, addDoc, serverTimestamp, onSnapshot, query } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  onSnapshot, 
+  query, 
+  updateDoc, 
+  deleteDoc, 
+  doc 
+} from "firebase/firestore";
+import { deleteAllTransactionsByWallet } from "./transactionService";
 
 export interface WalletData {
   id?: string;
@@ -27,6 +37,50 @@ export const createWallet = async (uid: string, walletData: WalletData) => {
     return docRef.id;
   } catch (error) {
     console.error("Error creating wallet:", error);
+    throw error;
+  }
+};
+
+/**
+ * Updates the metadata of an existing wallet.
+ * @param uid The user's unique ID.
+ * @param walletId The ID of the wallet to update.
+ * @param data The partial wallet data to update (name, icon, color).
+ */
+export const updateWalletMetadata = async (
+  uid: string,
+  walletId: string,
+  data: Partial<Pick<WalletData, "name" | "icon" | "color">>
+) => {
+  try {
+    const walletRef = doc(db, "users", uid, "wallets", walletId);
+    await updateDoc(walletRef, data);
+  } catch (error) {
+    console.error("Error updating wallet metadata:", error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes a wallet and optionally its associated transactions.
+ * @param uid The user's unique ID.
+ * @param walletId The ID of the wallet to delete.
+ * @param options Options for deletion, e.g., whether to delete transactions.
+ */
+export const deleteWallet = async (
+  uid: string,
+  walletId: string,
+  options: { deleteTransactions: boolean }
+) => {
+  try {
+    if (options.deleteTransactions) {
+      await deleteAllTransactionsByWallet(uid, walletId);
+    }
+
+    const walletRef = doc(db, "users", uid, "wallets", walletId);
+    await deleteDoc(walletRef);
+  } catch (error) {
+    console.error("Error deleting wallet:", error);
     throw error;
   }
 };
