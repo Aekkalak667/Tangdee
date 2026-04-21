@@ -149,13 +149,13 @@ const TransactionsPage = () => {
                   <TransactionItem
                     key={t.id}
                     name={t.name}
-                    category={t.category}
+                    category={t.categoryId || t.category}
                     amount={t.amount}
                     type={t.type}
-                    time={t.date.toLocaleTimeString(language === 'th' ? 'th-TH' : 'en-US', {
+                    time={t.date?.toDate ? t.date.toDate().toLocaleTimeString(language === 'th' ? 'th-TH' : 'en-US', {
                       hour: '2-digit',
                       minute: '2-digit',
-                    })}
+                    }) : ''}
                     showSeparator={index !== group.transactions.length - 1}
                   />
                 ))}

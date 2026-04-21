@@ -2,15 +2,16 @@
 
 import React from "react";
 import * as LucideIcons from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { categories } from "@/constants/categories";
 import styles from "./TransactionItem.module.css";
 
 interface TransactionItemProps {
   name: string;
-  category: string;
+  category: string; // The ID of the category
   amount: number;
-  type: "income" | "expense";
+  type: "income" | "expense" | "transfer";
   time?: string;
-  iconName?: string;
   showSeparator?: boolean;
   onClick?: () => void;
 }
@@ -21,12 +22,18 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   amount,
   type,
   time,
-  iconName = "CircleDollarSign",
   showSeparator = true,
   onClick,
 }) => {
+  const { t } = useLanguage();
+  
+  // Find category data from central library
+  const categoryData = categories.find(c => c.id === category);
+  const iconName = categoryData?.iconName || (type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
+  const categoryLabel = categoryData ? t(`dashboard.categories.${categoryData.labelKey}`) : category;
+
   // Dynamically get the icon component
-  const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.CircleDollarSign;
+  const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;
 
   const formattedAmount = new Intl.NumberFormat("th-TH", {
     style: "currency",
@@ -44,7 +51,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         <div className={styles.content}>
           <span className={styles.name}>{name}</span>
           <div className={styles.details}>
-            <span>{category}</span>
+            <span>{categoryLabel}</span>
             {time && (
               <>
                 <span>•</span>

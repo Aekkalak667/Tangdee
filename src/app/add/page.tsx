@@ -65,6 +65,18 @@ export default function AddTransactionPage() {
 
     setIsLoading(true);
     try {
+      const categoryName = t(`dashboard.categories.cat_${categoryId}`);
+      const txData = {
+        uid: user.uid,
+        amount: numericAmount,
+        type,
+        categoryId,
+        walletId,
+        note,
+        name: categoryName || categoryId,
+        category: categoryId,
+      };
+
       if (type === 'transfer') {
         await transferFunds(user.uid, {
           fromWalletId: walletId,
@@ -73,15 +85,7 @@ export default function AddTransactionPage() {
           note,
         });
       } else {
-        await addTransactionWithUpdate(user.uid, {
-          amount: numericAmount,
-          type,
-          categoryId,
-          walletId,
-          note,
-          name: t(`dashboard.categories.${categoryId}`) || categoryId,
-          category: categoryId,
-        });
+        await addTransactionWithUpdate(user.uid, txData);
       }
       router.push('/dashboard');
     } catch (error) {

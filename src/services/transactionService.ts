@@ -1,38 +1,31 @@
-import { db } from "@/lib/firebase.config";
 import { 
   collection, 
+  addDoc, 
   query, 
   where, 
-  getDocs, 
   onSnapshot, 
   orderBy, 
-  Timestamp,
-  runTransaction,
+  Timestamp, 
+  runTransaction, 
   doc,
-  serverTimestamp
+  getDocs,
+  limit
 } from "firebase/firestore";
+import { db } from "@/lib/firebase.config";
 
 export interface Transaction {
-  id: string;
+  id?: string;
+  uid: string;
   amount: number;
   type: 'income' | 'expense' | 'transfer';
-  date: Date;
   category: string;
+  categoryId: string;
   name: string;
   walletId: string;
-  uid: string;
   fromWalletId?: string;
   toWalletId?: string;
   note?: string;
-}
-
-export interface DailySummary {
-  totalIncome: number;
-  totalExpense: number;
-}
-
-export interface MonthlySummary {
-  [date: string]: DailySummary;
+  date: any; // Firestore Timestamp
 }
 
 export interface GroupedTransactions {
@@ -43,72 +36,155 @@ export interface GroupedTransactions {
   };
 }
 
+export interface MonthlySummary {
+  [date: string]: {
+    totalIncome: number;
+    totalExpense: number;
+  };
+}
+
 /**
- * Helper to group and filter transactions by date and search query.
+ * บันทึกรายการใหม่และอัปเดตยอดเงินในกระเป๋า (Atomic)
  */
-const groupAndFilterTransactions = (
-  transactions: Transaction[],
-  search?: string
-): GroupedTransactions => {
-  const grouped: GroupedTransactions = {};
+export const addTransactionWithUpdate = async (uid: string, txData: Omit<Transaction, 'id' | 'date'>) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const walletRef = doc(db, `users/${uid}/wallets`, txData.walletId);
+      const walletSnap = await transaction.get(walletRef);
 
-  const filtered = search
-    ? transactions.filter(t => 
-        t.name.toLowerCase().includes(search.toLowerCase()) ||
-        t.category.toLowerCase().includes(search.toLowerCase())
-      )
-    : transactions;
+      if (!walletSnap.exists()) {
+        throw new Error("Wallet does not exist!");
+      }
 
-  filtered.forEach(t => {
-    // Use local date string YYYY-MM-DD
-    const year = t.date.getFullYear();
-    const month = String(t.date.getMonth() + 1).padStart(2, '0');
-    const day = String(t.date.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
+      const currentBalance = walletSnap.data().balance || 0;
+      const newBalance = txData.type === 'income' 
+        ? currentBalance + txData.amount 
+        : currentBalance - txData.amount;
 
-    if (!grouped[dateStr]) {
-      grouped[dateStr] = {
-        transactions: [],
-        totalIncome: 0,
-        totalExpense: 0,
-      };
-    }
+      // 1. สร้าง Transaction Record
+      const txRef = doc(collection(db, "transactions"));
+      transaction.set(txRef, {
+        ...txData,
+        uid,
+        date: Timestamp.now(),
+      });
 
-    grouped[dateStr].transactions.push(t);
-    if (t.type === 'income') {
-      grouped[dateStr].totalIncome += t.amount;
-    } else {
-      grouped[dateStr].totalExpense += t.amount;
-    }
-  });
-
-  return grouped;
+      // 2. อัปเดตยอดเงินใน Wallet
+      transaction.update(walletRef, { balance: newBalance });
+    });
+  } catch (error) {
+    console.error("Add transaction failed: ", error);
+    throw error;
+  }
 };
 
 /**
- * Fetches transactions for a specific month and year with optional filtering.
- * 
- * @param filters Object containing uid, optional walletId, month (0-11), year, and optional search query.
- * @returns Promise resolving to GroupedTransactions.
+ * โอนเงินระหว่างกระเป๋า (Atomic)
  */
-export const fetchTransactions = async (filters: {
-  uid: string;
-  walletId?: string;
-  month: number;
-  year: number;
-  search?: string;
-}): Promise<GroupedTransactions> => {
-  const { uid, walletId, month, year, search } = filters;
-  
-  const startDate = new Date(year, month, 1);
-  const endDate = new Date(year, month + 1, 1);
+export const transferFunds = async (uid: string, data: { fromWalletId: string, toWalletId: string, amount: number, note?: string }) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const fromRef = doc(db, `users/${uid}/wallets`, data.fromWalletId);
+      const toRef = doc(db, `users/${uid}/wallets`, data.toWalletId);
+
+      const fromSnap = await transaction.get(fromRef);
+      const toSnap = await transaction.get(toRef);
+
+      if (!fromSnap.exists() || !toSnap.exists()) {
+        throw new Error("One or both wallets do not exist!");
+      }
+
+      const fromBalance = fromSnap.data().balance || 0;
+      const toBalance = toSnap.data().balance || 0;
+
+      // 1. สร้าง Record การโอน
+      const txRef = doc(collection(db, "transactions"));
+      transaction.set(txRef, {
+        uid,
+        amount: data.amount,
+        type: 'transfer',
+        fromWalletId: data.fromWalletId,
+        toWalletId: data.toWalletId,
+        walletId: data.fromWalletId, // ผูกกับต้นทางเพื่อให้เห็นในรายการ
+        category: 'Transfer',
+        categoryId: 'transfer',
+        name: `โอนย้ายไปยัง ${toSnap.data().name}`,
+        note: data.note,
+        date: Timestamp.now(),
+      });
+
+      // 2. อัปเดตยอดเงินทั้งสองกระเป๋า
+      transaction.update(fromRef, { balance: fromBalance - data.amount });
+      transaction.update(toRef, { balance: toBalance + data.amount });
+    });
+  } catch (error) {
+    console.error("Transfer failed: ", error);
+    throw error;
+  }
+};
+
+/**
+ * ดึงรายการแบบ Real-time พร้อม Filter และ Grouping (ลบ Mock ออก 100%)
+ */
+export const subscribeToTransactions = (
+  filters: { uid: string, walletId?: string | 'all', month: number, year: number, search?: string },
+  onUpdate: (data: GroupedTransactions) => void
+) => {
+  const startOfMonth = new Date(filters.year, filters.month, 1);
+  const endOfMonth = new Date(filters.year, filters.month + 1, 0, 23, 59, 59);
+
+  let q = query(
+    collection(db, "transactions"),
+    where("uid", "==", filters.uid),
+    where("date", ">=", Timestamp.fromDate(startOfMonth)),
+    where("date", "<=", Timestamp.fromDate(endOfMonth)),
+    orderBy("date", "desc")
+  );
+
+  if (filters.walletId && filters.walletId !== 'all') {
+    q = query(q, where("walletId", "==", filters.walletId));
+  }
+
+  return onSnapshot(q, (snapshot) => {
+    const grouped: GroupedTransactions = {};
+
+    snapshot.docs.forEach(doc => {
+      const data = { id: doc.id, ...doc.data() } as Transaction;
+      
+      // ค้นหาข้อความ (Client-side search เนื่องจาก Firestore ทำ Full-text search ไม่ได้ง่ายๆ)
+      if (filters.search) {
+        const search = filters.search.toLowerCase();
+        const matches = data.name.toLowerCase().includes(search) || data.category.toLowerCase().includes(search);
+        if (!matches) return;
+      }
+
+      const dateStr = data.date.toDate().toISOString().split('T')[0];
+
+      if (!grouped[dateStr]) {
+        grouped[dateStr] = { transactions: [], totalIncome: 0, totalExpense: 0 };
+      }
+
+      grouped[dateStr].transactions.push(data);
+      if (data.type === 'income') grouped[dateStr].totalIncome += data.amount;
+      if (data.type === 'expense') grouped[dateStr].totalExpense += data.amount;
+    });
+
+    onUpdate(grouped);
+  });
+};
+
+/**
+ * ดึงยอดสรุปรายเดือนสำหรับปฏิทิน (ข้อมูลจริง)
+ */
+export const getDailySummary = async (uid: string, month: number, year: number, walletId?: string | 'all'): Promise<MonthlySummary> => {
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
 
   let q = query(
     collection(db, "transactions"),
     where("uid", "==", uid),
-    where("date", ">=", Timestamp.fromDate(startDate)),
-    where("date", "<", Timestamp.fromDate(endDate)),
-    orderBy("date", "desc")
+    where("date", ">=", Timestamp.fromDate(startOfMonth)),
+    where("date", "<=", Timestamp.fromDate(endOfMonth))
   );
 
   if (walletId && walletId !== 'all') {
@@ -116,247 +192,19 @@ export const fetchTransactions = async (filters: {
   }
 
   const snapshot = await getDocs(q);
-  const transactions: Transaction[] = snapshot.docs.map(doc => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      ...data,
-      date: data.date.toDate(),
-    } as Transaction;
-  });
-
-  return groupAndFilterTransactions(transactions, search);
-};
-
-/**
- * Subscribes to real-time transaction updates with filtering.
- * 
- * @param filters Object containing uid, optional walletId, month (0-11), year, and optional search query.
- * @param onUpdate Callback function that receives the updated GroupedTransactions.
- * @returns Unsubscribe function.
- */
-export const subscribeToTransactions = (
-  filters: {
-    uid: string;
-    walletId?: string;
-    month: number;
-    year: number;
-    search?: string;
-  },
-  onUpdate: (data: GroupedTransactions) => void
-) => {
-  const { uid, walletId, month, year, search } = filters;
-  
-  const startDate = new Date(year, month, 1);
-  const endDate = new Date(year, month + 1, 1);
-
-  let q = query(
-    collection(db, "transactions"),
-    where("uid", "==", uid),
-    where("date", ">=", Timestamp.fromDate(startDate)),
-    where("date", "<", Timestamp.fromDate(endDate)),
-    orderBy("date", "desc")
-  );
-
-  if (walletId && walletId !== 'all') {
-    q = query(q, where("walletId", "==", walletId));
-  }
-
-  return onSnapshot(q, (snapshot) => {
-    const transactions: Transaction[] = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        date: data.date.toDate(),
-      } as Transaction;
-    });
-
-    onUpdate(groupAndFilterTransactions(transactions, search));
-  }, (error) => {
-    console.error("Error subscribing to transactions:", error);
-  });
-};
-
-/**
- * Fetches daily summaries for a specific month and year.
- * Returns an object where keys are date strings (YYYY-MM-DD).
- * 
- * @param uid User ID
- * @param month Month (0-11)
- * @param year Year (e.g., 2026)
- * @param walletId Optional wallet ID to filter by
- * @returns Promise resolving to MonthlySummary
- */
-export const getDailySummary = async (
-  uid: string, 
-  month: number, 
-  year: number, 
-  walletId?: string
-): Promise<MonthlySummary> => {
-  const grouped = await fetchTransactions({ uid, month, year, walletId });
-  
   const summary: MonthlySummary = {};
-  Object.keys(grouped).forEach(date => {
-    summary[date] = {
-      totalIncome: grouped[date].totalIncome,
-      totalExpense: grouped[date].totalExpense,
-    };
+
+  snapshot.docs.forEach(doc => {
+    const data = doc.data() as Transaction;
+    const dateStr = data.date.toDate().toISOString().split('T')[0];
+
+    if (!summary[dateStr]) {
+      summary[dateStr] = { totalIncome: 0, totalExpense: 0 };
+    }
+
+    if (data.type === 'income') summary[dateStr].totalIncome += data.amount;
+    if (data.type === 'expense') summary[dateStr].totalExpense += data.amount;
   });
 
   return summary;
 };
-
-/**
- * Fetches transactions for a specific date.
- * 
- * @param uid User ID
- * @param date Date string (YYYY-MM-DD)
- * @param walletId Optional wallet ID to filter by
- * @returns Promise resolving to Transaction[]
- */
-export const getTransactionsByDate = async (
-  uid: string, 
-  date: string, 
-  walletId?: string
-): Promise<Transaction[]> => {
-  const [year, month, day] = date.split('-').map(Number);
-  const startDate = new Date(year, month - 1, day);
-  const endDate = new Date(year, month - 1, day + 1);
-
-  let q = query(
-    collection(db, "transactions"),
-    where("uid", "==", uid),
-    where("date", ">=", Timestamp.fromDate(startDate)),
-    where("date", "<", Timestamp.fromDate(endDate)),
-    orderBy("date", "desc")
-  );
-
-  if (walletId && walletId !== 'all') {
-    q = query(q, where("walletId", "==", walletId));
-  }
-
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      ...data,
-      date: data.date.toDate(),
-    } as Transaction;
-  });
-};
-
-/**
- * Adds a new transaction and updates the wallet balance atomically.
- * 
- * @param uid User ID
- * @param txData Transaction data (excluding id and date)
- */
-export const addTransactionWithUpdate = async (
-  uid: string,
-  txData: Omit<Transaction, 'id' | 'date'>
-) => {
-  try {
-    await runTransaction(db, async (transaction) => {
-      const walletRef = doc(db, "users", uid, "wallets", txData.walletId);
-      const walletDoc = await transaction.get(walletRef);
-
-      if (!walletDoc.exists()) {
-        throw new Error("Wallet does not exist!");
-      }
-
-      const currentBalance = Number(walletDoc.data().balance) || 0;
-      const amount = Number(txData.amount);
-      const newBalance = txData.type === 'income' 
-        ? currentBalance + amount 
-        : currentBalance - amount;
-
-      // Create a new transaction document reference
-      const txRef = doc(collection(db, "transactions"));
-      
-      // Set transaction data
-      transaction.set(txRef, {
-        ...txData,
-        amount: amount,
-        date: serverTimestamp(),
-      });
-
-      // Update wallet balance
-      transaction.update(walletRef, { balance: newBalance });
-    });
-  } catch (error) {
-    console.error("Error adding transaction with update:", error);
-    throw error;
-  }
-};
-
-/**
- * Transfers funds between two wallets atomically.
- * 
- * @param uid User ID
- * @param data Transfer data (fromWalletId, toWalletId, amount, note)
- */
-export const transferFunds = async (
-  uid: string,
-  data: { 
-    fromWalletId: string; 
-    toWalletId: string; 
-    amount: number; 
-    note?: string;
-  }
-) => {
-  const { fromWalletId, toWalletId, amount, note } = data;
-
-  try {
-    await runTransaction(db, async (transaction) => {
-      const fromWalletRef = doc(db, "users", uid, "wallets", fromWalletId);
-      const toWalletRef = doc(db, "users", uid, "wallets", toWalletId);
-
-      const fromWalletDoc = await transaction.get(fromWalletRef);
-      const toWalletDoc = await transaction.get(toWalletRef);
-
-      if (!fromWalletDoc.exists()) {
-        throw new Error("Source wallet does not exist!");
-      }
-      if (!toWalletDoc.exists()) {
-        throw new Error("Destination wallet does not exist!");
-      }
-
-      const fromBalance = Number(fromWalletDoc.data().balance) || 0;
-      const toBalance = Number(toWalletDoc.data().balance) || 0;
-
-      if (fromBalance < amount) {
-        throw new Error("Insufficient balance in the source wallet!");
-      }
-
-      const newFromBalance = fromBalance - amount;
-      const newToBalance = toBalance + amount;
-
-      // Create a new transaction document reference
-      const txRef = doc(collection(db, "transactions"));
-      
-      // Set transaction data
-      transaction.set(txRef, {
-        uid,
-        amount,
-        type: 'transfer',
-        fromWalletId,
-        toWalletId,
-        note: note || '',
-        category: 'Transfer',
-        name: `Transfer from ${fromWalletDoc.data().name} to ${toWalletDoc.data().name}`,
-        date: serverTimestamp(),
-        walletId: fromWalletId, // Primary wallet for this record
-      });
-
-      // Update both wallet balances
-      transaction.update(fromWalletRef, { balance: newFromBalance });
-      transaction.update(toWalletRef, { balance: newToBalance });
-    });
-  } catch (error) {
-    console.error("Error transferring funds:", error);
-    throw error;
-  }
-};
-
