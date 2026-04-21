@@ -3,24 +3,26 @@
     "app_name": "Tang Dee",
     "loading": "Loading...",
     "back": "Back",
-    "back_home": "Back to Home",
+    "back_home": "Back Home",
     "preview": "Preview",
-    "user_fallback": "User",
-    "rights_reserved": "All rights reserved.",
-    "search_placeholder": "Search transactions or categories...",
+    "done": "Done",
+    "manage": "Manage",
+    "save": "Save",
+    "saving": "Saving...",
+    "search_placeholder": "Search name or category...",
     "retry": "Retry",
     "error_generic": "Something went wrong. Please try again."
   },
   "auth": {
-    "login_title": "Better Money Flow",
-    "login_subtitle": "Start tracking your finance with ease",
+    "login_title": "Finance made simple",
+    "login_subtitle": "Start tracking your income and expenses today.",
     "login_google": "Sign in with Google",
     "logout": "Logout"
   },
   "home": {
     "welcome": "Welcome back",
-    "subtitle": "Ready to take control of your finances?",
-    "create_first_wallet": "Create Your First Wallet"
+    "subtitle": "Ready to manage your finances?",
+    "create_first_wallet": "Create your first wallet"
   },
   "dashboard": {
     "total_balance": "Total Balance",
@@ -30,7 +32,7 @@
     "add_wallet": "Add Wallet",
     "spending_summary": "Spending Summary",
     "show_all": "Show All",
-    "no_data": "No data available",
+    "no_data": "No Data",
     "daily_recap": "Daily Recap",
     "today": "Today",
     "income": "Income",
@@ -38,7 +40,7 @@
     "transfer": "Transfer",
     "groups": {
       "food": "Food",
-      "transport": "Travel",
+      "transport": "Transport",
       "utilities": "Utilities",
       "lifestyle": "Lifestyle",
       "health": "Health",
@@ -81,16 +83,16 @@
       "cat_investment": "Investment",
       "cat_bonus": "Bonus",
       "cat_interest": "Interest",
-      "cat_other_income": "Other"
+      "cat_other_income": "Others"
     },
     "days": {
-      "sun": "S",
-      "mon": "M",
-      "tue": "T",
-      "wed": "W",
-      "thu": "T",
-      "fri": "F",
-      "sat": "S"
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
     }
   },
   "wallet": {
@@ -102,20 +104,22 @@
     "add_new": "Add New Wallet",
     "overview": "Overview",
     "create_title": "Create New Wallet",
-    "create_subtitle": "Set up your wallet to start tracking your expenses.",
-    "preview_info": "Your wallet will be visible on your dashboard. You can always change these settings later.",
+    "create_subtitle": "Setup your wallet to start tracking transactions.",
+    "preview_info": "Your wallet will be displayed on the dashboard. You can change these settings later.",
     "creating": "Creating...",
-    "error_login_required": "You must be logged in to create a wallet.",
-    "error_name_required": "Please enter a wallet name.",
+    "error_login_required": "Please login to create a wallet.",
+    "error_name_required": "Wallet name is required.",
     "error_create_failed": "Failed to create wallet. Please try again.",
-    "error_same_wallet": "Cannot transfer to the same wallet",
+    "error_update_failed": "Failed to update wallet. Please try again.",
+    "error_delete_failed": "Failed to delete wallet. Please try again.",
+    "error_same_wallet": "Cannot transfer to the same wallet.",
     "current_balance": "Current Balance",
     "name_label": "Wallet Name",
-    "balance_label": "Initial Balance",
+    "balance_label": "Starting Balance",
     "currency_label": "Currency",
     "type_label": "Wallet Type",
-    "color_label": "Pick a Color",
-    "icon_label": "Pick an Icon",
+    "color_label": "Color",
+    "icon_label": "Icon",
     "create_button": "Create Wallet",
     "placeholder_name": "e.g. Cash, Bank Account",
     "types": {
@@ -131,13 +135,13 @@
     "delete_description": "Are you sure you want to delete {name}? This action cannot be undone.",
     "delete_only": "Delete Wallet Only",
     "delete_only_subtitle": "Keep transaction history in reports",
-    "delete_all": "Delete Wallet and all Transactions",
+    "delete_all": "Delete Wallet and All Transactions",
     "delete_all_subtitle": "Recommended for a clean start",
     "cancel": "Cancel"
   },
   "nav": {
     "home": "Home",
-    "transactions": "Transactions",
+    "transactions": "History",
     "add": "Add",
     "wallet": "Wallets",
     "settings": "Settings"
@@ -146,13 +150,18 @@
     "title": "Settings",
     "language": "Language",
     "language_name": "English",
-    "language_info": "Choose your preferred language for the application.",
+    "language_info": "Choose your preferred language",
     "about": "About Us",
-    "version": "App Version",
+    "about_title": "About Tang Dee",
+    "mission_title": "Our Mission",
+    "mission_desc": "Tang Dee was built to strip away the noise of traditional finance apps, allowing you to focus on what matters most: financial health through radical simplicity.",
+    "creator_title": "Developer",
+    "creator_desc": "Designed and developed by a minimalist creator who believes the best tools are those that respect the user's focus and time.",
+    "version": "Version",
     "logout_confirm": "Are you sure you want to logout?"
   },
   "transactions": {
-    "title": "Transaction History",
+    "title": "Transactions",
     "no_data": "No transactions found for this period",
     "search_placeholder": "Search name or category...",
     "save_button": "Save Transaction",
@@ -162,4 +171,3 @@
     "no_more_data": "No more transactions"
   }
 }
-

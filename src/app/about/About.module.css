@@ -1,0 +1,148 @@
+.container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-bottom: 8rem;
+}
+
+.header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #000000;
+  padding: 0.5rem;
+  margin-left: -0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: #f3f4f6;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.content {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logoWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 2rem;
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+.appName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 0.25rem;
+}
+
+.tagline {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: #f9fafb;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #f3f4f6;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.cardHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.icon {
+  color: #50c878; /* Emerald Accent */
+}
+
+.card p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.socialSection {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.socialLink {
+  color: #9ca3af;
+  transition: color 0.2s;
+}
+
+.socialLink:hover {
+  color: #000000;
+}
+
+.footer {
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.footer p {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.copyright {
+  margin-top: 0.25rem;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import styles from './MenuSection.module.css';
+import { motion } from 'framer-motion';
 
 interface MenuSectionProps {
   children: React.ReactNode;
@@ -26,13 +27,18 @@ export const MenuRow: React.FC<MenuRowProps> = ({
   showChevron = true 
 }) => {
   return (
-    <div className={styles.row} onClick={onClick}>
+    <motion.div 
+      className={styles.row} 
+      onClick={onClick}
+      whileTap={{ backgroundColor: 'rgba(0, 0, 0, 0.05)', scale: 0.98 }}
+      transition={{ duration: 0.1 }}
+    >
       {icon && <div className={styles.icon}>{icon}</div>}
       <div className={styles.label}>{label}</div>
       <div className={styles.right}>
-        {secondaryInfo && <span style={{ fontSize: '0.875rem' }}>{secondaryInfo}</span>}
+        {secondaryInfo && <span style={{ fontSize: '0.875rem', color: 'var(--gray-500)' }}>{secondaryInfo}</span>}
         {showChevron && <ChevronRight className={styles.chevron} size={20} />}
       </div>
-    </div>
+    </motion.div>
   );
 };
