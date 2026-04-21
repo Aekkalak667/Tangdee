@@ -1,0 +1,78 @@
+.container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--gray-500);
+}
+
+.responsiveGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+}
+
+@media (min-width: 768px) {
+  .responsiveGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: sticky;
+  top: 40px;
+  height: fit-content;
+}
+
+.previewLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gray-400);
+  align-self: flex-start;
+}
+
+.infoBox {
+  padding: 20px;
+  background: var(--gray-50);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  border: 1px dashed var(--gray-200);
+}
+
+.submitButton {
+  margin-top: 40px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+}

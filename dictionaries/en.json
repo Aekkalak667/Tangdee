@@ -1,0 +1,50 @@
+{
+  "common": {
+    "app_name": "Tang Dee",
+    "loading": "Loading...",
+    "back": "Back",
+    "back_home": "Back to Home",
+    "preview": "Preview",
+    "user_fallback": "User",
+    "rights_reserved": "All rights reserved.",
+    "error_generic": "Something went wrong. Please try again."
+  },
+  "auth": {
+    "login_title": "Better Money Flow",
+    "login_subtitle": "Start tracking your finance with ease",
+    "login_google": "Sign in with Google",
+    "logout": "Logout"
+  },
+  "home": {
+    "welcome": "Welcome back",
+    "subtitle": "Ready to take control of your finances?",
+    "create_first_wallet": "Create Your First Wallet"
+  },
+  "wallet": {
+    "create_title": "Create New Wallet",
+    "create_subtitle": "Set up your wallet to start tracking your expenses.",
+    "preview_info": "Your wallet will be visible on your dashboard. You can always change these settings later.",
+    "creating": "Creating...",
+    "error_login_required": "You must be logged in to create a wallet.",
+    "error_name_required": "Please enter a wallet name.",
+    "error_create_failed": "Failed to create wallet. Please try again.",
+    "current_balance": "Current Balance",
+    "name_label": "Wallet Name",
+    "balance_label": "Initial Balance",
+    "currency_label": "Currency",
+    "type_label": "Wallet Type",
+    "color_label": "Pick a Color",
+    "icon_label": "Pick an Icon",
+    "create_button": "Create Wallet",
+    "placeholder_name": "e.g. Cash, Bank Account",
+    "types": {
+      "cash": "Cash",
+      "bank": "Bank Account",
+      "card": "Credit/Debit Card",
+      "savings": "Savings",
+      "investment": "Investment",
+      "digital": "Digital Wallet",
+      "other": "Other"
+    }
+  }
+}
