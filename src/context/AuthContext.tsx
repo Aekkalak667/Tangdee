@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase.config";
 import { useRouter, usePathname } from "next/navigation";
+import AppLoader from "@/components/ui/AppLoader";
 
 interface AuthContextType {
   user: User | null;
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
-      {!loading && children}
+      {loading ? <AppLoader /> : children}
     </AuthContext.Provider>
   );
 };

@@ -1,0 +1,169 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.walletLoader {
+  --wallet-color: #000000;
+  --wallet-dark: #1a1a1a;
+  --bill-color: #50c878; /* Emerald Green */
+  --bill-detail: #2d7a4a;
+  --txt-color: #ffffff;
+  --duration: 3s;
+
+  position: relative;
+  width: 110px;
+  height: 80px;
+  margin-bottom: 2rem;
+}
+
+/* --- WALLET BACK --- */
+.walletLoader .walletBack {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  width: 100px;
+  height: 45px;
+  background: var(--wallet-dark);
+  border-radius: 5px 5px 0 0;
+  z-index: 0;
+}
+
+/* --- BILLS --- */
+.walletLoader .bill {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -30px;
+  width: 70px;
+  height: 40px;
+  background: var(--bill-color);
+  border-radius: 2px;
+  border: 1px solid var(--bill-detail);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Baht Symbol */
+.walletLoader .bill::before {
+  content: "฿";
+  font-family: var(--font-prompt), sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+  color: var(--bill-detail);
+  border: 2px solid var(--bill-detail);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Bill Decorative Lines */
+.walletLoader .bill::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  bottom: 3px;
+  border: 1px dashed var(--bill-detail);
+  border-radius: 1px;
+}
+
+.walletLoader .bill1 {
+  z-index: 1;
+  animation: slide-in var(--duration) ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.walletLoader .bill2 {
+  z-index: 2;
+  animation: slide-in var(--duration) ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.walletLoader .bill3 {
+  z-index: 3;
+  animation: slide-in var(--duration) ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+/* --- WALLET FRONT --- */
+.walletLoader .walletFront {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 110px;
+  height: 52px;
+  background: linear-gradient(180deg, var(--wallet-color), var(--wallet-dark));
+  border-radius: 6px 6px 10px 10px;
+  z-index: 10;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: wallet-bounce var(--duration) ease-in-out infinite;
+}
+
+.walletLoader .walletFront::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  top: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 4px 4px 8px 8px;
+  pointer-events: none;
+}
+
+/* --- TEXT STYLING --- */
+.text {
+  font-family: var(--font-prompt), sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #000000;
+  letter-spacing: 0.5px;
+}
+
+.dot {
+  display: inline-block;
+  animation: wave 1.5s infinite;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.1s; }
+.dot:nth-child(3) { animation-delay: 0.2s; }
+
+@keyframes slide-in {
+  0% { top: -30px; opacity: 0; transform: translateX(-50%) scale(0.8); }
+  10% { opacity: 1; }
+  25% { top: 18px; transform: translateX(-50%) scale(1); }
+  90% { top: 18px; opacity: 1; }
+  100% { top: 18px; opacity: 0; }
+}
+
+@keyframes wallet-bounce {
+  0%, 100% { transform: scale(1); }
+  12%, 32%, 52% { transform: scale(1.05, 0.95); }
+  15%, 35%, 55% { transform: scale(1); }
+}
+
+@keyframes wave {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
