@@ -1,18 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
   subscribeToTransactions, 
-  GroupedTransactions 
+  GroupedTransactions,
+  Transaction,
+  deleteTransactionWithUpdate
 } from '@/services/transactionService';
 import { subscribeToWallets, WalletData } from '@/services/walletService';
 import { 
   SearchBar, 
   FilterBar, 
   TransactionGroup, 
-  TransactionItem 
+  TransactionItem,
+  TransactionActionSheet
 } from '@/components/transactions';
 import { Loader2, Inbox, AlertCircle } from 'lucide-react';
 import styles from './Transactions.module.css';
@@ -20,12 +24,17 @@ import styles from './Transactions.module.css';
 const TransactionsPage = () => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const router = useRouter();
 
   // Filters State
   const [walletId, setWalletId] = useState<string | 'all'>('all');
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [search, setSearch] = useState<string>('');
+
+  // Action Sheet State
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
 
   // Pagination State
   const [pageSize, setPageSize] = useState<number>(20);
@@ -126,6 +135,29 @@ const TransactionsPage = () => {
     setHasMore(true);
   };
 
+  const handleTransactionClick = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsActionSheetOpen(true);
+  };
+
+  const handleEdit = (transaction: Transaction) => {
+    router.push(`/transactions/${transaction.id}/edit`);
+  };
+
+  const handleDelete = async (transaction: Transaction) => {
+    if (!user || !transaction.id) return;
+    
+    const confirmDelete = window.confirm(t('transactions.confirm_delete'));
+    if (!confirmDelete) return;
+
+    try {
+      await deleteTransactionWithUpdate(user.uid, transaction.id);
+    } catch (err) {
+      console.error('Failed to delete transaction:', err);
+      alert(t('common.error'));
+    }
+  };
+
   const formatDateLabel = (dateStr: string) => {
     const date = new Date(dateStr);
     const today = new Date();
@@ -197,18 +229,19 @@ const TransactionsPage = () => {
                   totalIncome={group.totalIncome}
                   totalExpense={group.totalExpense}
                 >
-                  {group.transactions.map((t, index) => (
+                  {group.transactions.map((tx, index) => (
                     <TransactionItem
-                      key={t.id}
-                      name={t.name}
-                      category={t.categoryId || t.category}
-                      amount={t.amount}
-                      type={t.type}
-                      time={t.date?.toDate ? t.date.toDate().toLocaleTimeString(language === 'th' ? 'th-TH' : 'en-US', {
+                      key={tx.id}
+                      name={tx.name}
+                      category={tx.categoryId || tx.category}
+                      amount={tx.amount}
+                      type={tx.type}
+                      time={tx.date?.toDate ? tx.date.toDate().toLocaleTimeString(language === 'th' ? 'th-TH' : 'en-US', {
                         hour: '2-digit',
                         minute: '2-digit',
                       }) : ''}
                       showSeparator={index !== group.transactions.length - 1}
+                      onClick={() => handleTransactionClick(tx)}
                     />
                   ))}
                 </TransactionGroup>
@@ -231,6 +264,14 @@ const TransactionsPage = () => {
           </>
         )}
       </main>
+
+      <TransactionActionSheet
+        isOpen={isActionSheetOpen}
+        onClose={() => setIsActionSheetOpen(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        transaction={selectedTransaction}
+      />
     </div>
   );
 };

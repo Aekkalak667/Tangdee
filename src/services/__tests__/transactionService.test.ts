@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { addTransactionWithUpdate, transferFunds } from '../transactionService';
+import { addTransactionWithUpdate, transferFunds, deleteTransactionWithUpdate, updateTransactionWithUpdate } from '../transactionService';
 import { runTransaction, doc, collection, Timestamp } from 'firebase/firestore';
 
 vi.mock('firebase/firestore', () => ({
@@ -195,6 +195,181 @@ describe('transactionService', () => {
         fromWalletId: 'wallet1',
         toWalletId: 'wallet2',
       }));
+    });
+  });
+
+  describe('deleteTransactionWithUpdate', () => {
+    it('should reverse income balance and delete transaction', async () => {
+      const mockTxData = {
+        amount: 100,
+        type: 'income',
+        walletId: 'wallet1',
+      };
+
+      const mockTxSnap = {
+        exists: () => true,
+        data: () => mockTxData,
+      };
+
+      const mockWalletSnap = {
+        exists: () => true,
+        data: () => ({ balance: 500 }),
+      };
+
+      const mockTransaction = {
+        get: vi.fn().mockImplementation((ref) => {
+          if (ref.id === 'tx1') return Promise.resolve(mockTxSnap);
+          if (ref.id === 'wallet1') return Promise.resolve(mockWalletSnap);
+          return Promise.resolve({ exists: () => false });
+        }),
+        update: vi.fn(),
+        delete: vi.fn(),
+      };
+
+      (runTransaction as any).mockImplementation(async (db: any, cb: any) => {
+        return await cb(mockTransaction);
+      });
+
+      (doc as any).mockImplementation((...args: any[]) => {
+        const id = args[2] || args[1];
+        return { id };
+      });
+
+      await deleteTransactionWithUpdate(mockUid, 'tx1');
+
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet1' }, { balance: 400 });
+      expect(mockTransaction.delete).toHaveBeenCalledWith({ id: 'tx1' });
+    });
+
+    it('should reverse transfer balance and delete transaction', async () => {
+      const mockTxData = {
+        amount: 200,
+        type: 'transfer',
+        fromWalletId: 'wallet1',
+        toWalletId: 'wallet2',
+      };
+
+      const mockTxSnap = {
+        exists: () => true,
+        data: () => mockTxData,
+      };
+
+      const mockFromSnap = { exists: () => true, data: () => ({ balance: 800 }) };
+      const mockToSnap = { exists: () => true, data: () => ({ balance: 700 }) };
+
+      const mockTransaction = {
+        get: vi.fn().mockImplementation((ref) => {
+          if (ref.id === 'tx1') return Promise.resolve(mockTxSnap);
+          if (ref.id === 'wallet1') return Promise.resolve(mockFromSnap);
+          if (ref.id === 'wallet2') return Promise.resolve(mockToSnap);
+          return Promise.resolve({ exists: () => false });
+        }),
+        update: vi.fn(),
+        delete: vi.fn(),
+      };
+
+      (runTransaction as any).mockImplementation(async (db: any, cb: any) => {
+        return await cb(mockTransaction);
+      });
+
+      (doc as any).mockImplementation((...args: any[]) => {
+        const id = args[2] || args[1];
+        return { id };
+      });
+
+      await deleteTransactionWithUpdate(mockUid, 'tx1');
+
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet1' }, { balance: 1000 });
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet2' }, { balance: 500 });
+      expect(mockTransaction.delete).toHaveBeenCalledWith({ id: 'tx1' });
+    });
+  });
+
+  describe('updateTransactionWithUpdate', () => {
+    it('should handle amount change correctly', async () => {
+      const oldTxData = {
+        amount: 100,
+        type: 'income',
+        walletId: 'wallet1',
+      };
+
+      const mockTxSnap = {
+        exists: () => true,
+        data: () => oldTxData,
+      };
+
+      const mockWalletSnap = {
+        exists: () => true,
+        data: () => ({ balance: 500 }),
+      };
+
+      const mockTransaction = {
+        get: vi.fn().mockImplementation((ref) => {
+          if (ref.id === 'tx1') return Promise.resolve(mockTxSnap);
+          if (ref.id === 'wallet1') return Promise.resolve(mockWalletSnap);
+          return Promise.resolve({ exists: () => false });
+        }),
+        update: vi.fn(),
+      };
+
+      (runTransaction as any).mockImplementation(async (db: any, cb: any) => {
+        return await cb(mockTransaction);
+      });
+
+      (doc as any).mockImplementation((...args: any[]) => {
+        const id = args[2] || args[1];
+        return { id };
+      });
+
+      // Change amount from 100 to 150
+      await updateTransactionWithUpdate(mockUid, 'tx1', { amount: 150 });
+
+      // Reverse 100 (500-100=400), Apply 150 (400+150=550)
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet1' }, { balance: 550 });
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'tx1' }, { amount: 150 });
+    });
+
+    it('should handle wallet change correctly', async () => {
+      const oldTxData = {
+        amount: 100,
+        type: 'expense',
+        walletId: 'wallet1',
+      };
+
+      const mockTxSnap = {
+        exists: () => true,
+        data: () => oldTxData,
+      };
+
+      const mockWallet1Snap = { exists: () => true, data: () => ({ balance: 400 }) };
+      const mockWallet2Snap = { exists: () => true, data: () => ({ balance: 1000 }) };
+
+      const mockTransaction = {
+        get: vi.fn().mockImplementation((ref) => {
+          if (ref.id === 'tx1') return Promise.resolve(mockTxSnap);
+          if (ref.id === 'wallet1') return Promise.resolve(mockWallet1Snap);
+          if (ref.id === 'wallet2') return Promise.resolve(mockWallet2Snap);
+          return Promise.resolve({ exists: () => false });
+        }),
+        update: vi.fn(),
+      };
+
+      (runTransaction as any).mockImplementation(async (db: any, cb: any) => {
+        return await cb(mockTransaction);
+      });
+
+      (doc as any).mockImplementation((...args: any[]) => {
+        const id = args[2] || args[1];
+        return { id };
+      });
+
+      // Change wallet from wallet1 to wallet2
+      await updateTransactionWithUpdate(mockUid, 'tx1', { walletId: 'wallet2' });
+
+      // Wallet1: Reverse expense 100 (400+100=500)
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet1' }, { balance: 500 });
+      // Wallet2: Apply expense 100 (1000-100=900)
+      expect(mockTransaction.update).toHaveBeenCalledWith({ id: 'wallet2' }, { balance: 900 });
     });
   });
 });

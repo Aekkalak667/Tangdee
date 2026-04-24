@@ -36,3 +36,8 @@
 - **Issue:** `Export Github doesn't exist in target module lucide-react`
 - **Root Cause:** เวอร์ชันของ `lucide-react` เก่าเกินไป (`1.8.0`) และมีการถอด Brand Icons ออกในเวอร์ชันใหม่
 - **Fix:** อัพเกรด `lucide-react@latest` และเปลี่ยนการใช้ไอคอนแบรนด์ (Github/Twitter) ไปใช้ไอคอนมาตรฐาน (Globe/Mail/User) เพื่อให้ Build ผ่านและแสดงผลได้คงเส้นคงวา
+
+### 8. Action Sheet Obscured by Bottom Nav
+- **Issue:** ปุ่ม "ยกเลิก" ใน TransactionActionSheet โดนแถบ Bottom Nav บัง ทำให้กดยากหรือมองไม่เห็น
+- **Root Cause:** Padding-bottom ของ Bottom Sheet ไม่เพียงพอที่จะดันเนื้อหาขึ้นมาเหนือแถบเมนูที่ลอยอยู่ (Floating Nav)
+- **Fix:** เพิ่ม `padding-bottom: 8rem` ให้กับ `.sheet` ในไฟล์ `TransactionActionSheet.module.css` เพื่อให้เนื้อหาทั้งหมดลอยพ้นแถบนำทางหลัก

@@ -152,6 +152,144 @@ export const transferFunds = async (uid: string, data: { fromWalletId: string, t
 };
 
 /**
+ * ลบรายการและอัปเดตยอดเงินในกระเป๋า (Atomic)
+ */
+export const deleteTransactionWithUpdate = async (uid: string, transactionId: string) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const txRef = doc(db, "transactions", transactionId);
+      const txSnap = await transaction.get(txRef);
+
+      if (!txSnap.exists()) {
+        throw new Error("Transaction does not exist!");
+      }
+
+      const txData = txSnap.data() as Transaction;
+
+      if (txData.type === 'transfer') {
+        const fromWalletRef = doc(db, `users/${uid}/wallets`, txData.fromWalletId!);
+        const toWalletRef = doc(db, `users/${uid}/wallets`, txData.toWalletId!);
+
+        const fromSnap = await transaction.get(fromWalletRef);
+        const toSnap = await transaction.get(toWalletRef);
+
+        if (fromSnap.exists()) {
+          transaction.update(fromWalletRef, { balance: (fromSnap.data().balance || 0) + txData.amount });
+        }
+        if (toSnap.exists()) {
+          transaction.update(toWalletRef, { balance: (toSnap.data().balance || 0) - txData.amount });
+        }
+      } else {
+        const walletRef = doc(db, `users/${uid}/wallets`, txData.walletId);
+        const walletSnap = await transaction.get(walletRef);
+
+        if (walletSnap.exists()) {
+          const currentBalance = walletSnap.data().balance || 0;
+          const newBalance = txData.type === 'income' 
+            ? currentBalance - txData.amount 
+            : currentBalance + txData.amount;
+          
+          transaction.update(walletRef, { balance: newBalance });
+        }
+      }
+
+      transaction.delete(txRef);
+    });
+  } catch (error) {
+    console.error("Delete transaction failed: ", error);
+    throw error;
+  }
+};
+
+/**
+ * อัปเดตรายการและปรับปรุงยอดเงินในกระเป๋า (Atomic)
+ */
+export const updateTransactionWithUpdate = async (uid: string, transactionId: string, newData: Partial<Transaction>) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const txRef = doc(db, "transactions", transactionId);
+      const txSnap = await transaction.get(txRef);
+
+      if (!txSnap.exists()) {
+        throw new Error("Transaction does not exist!");
+      }
+
+      const oldData = txSnap.data() as Transaction;
+      const updatedData = { ...oldData, ...newData };
+
+      // รวบรวม Wallet IDs ทั้งหมดที่เกี่ยวข้องเพื่ออ่านค่าก่อน (Firestore Transaction requirement)
+      const walletIds = new Set<string>();
+      if (oldData.walletId) walletIds.add(oldData.walletId);
+      if (oldData.fromWalletId) walletIds.add(oldData.fromWalletId);
+      if (oldData.toWalletId) walletIds.add(oldData.toWalletId);
+      if (updatedData.walletId) walletIds.add(updatedData.walletId);
+      if (updatedData.fromWalletId) walletIds.add(updatedData.fromWalletId);
+      if (updatedData.toWalletId) walletIds.add(updatedData.toWalletId);
+
+      const walletSnaps: Record<string, any> = {};
+      const walletRefs: Record<string, any> = {};
+
+      for (const id of walletIds) {
+        if (!id) continue;
+        const ref = doc(db, `users/${uid}/wallets`, id);
+        walletRefs[id] = ref;
+        const snap = await transaction.get(ref);
+        if (snap.exists()) {
+          walletSnaps[id] = snap.data().balance || 0;
+        }
+      }
+
+      const finalBalances: Record<string, number> = { ...walletSnaps };
+
+      // 1. คืนยอดเก่า (Reverse old impact)
+      if (oldData.type === 'transfer') {
+        if (oldData.fromWalletId && finalBalances[oldData.fromWalletId] !== undefined) {
+          finalBalances[oldData.fromWalletId] += oldData.amount;
+        }
+        if (oldData.toWalletId && finalBalances[oldData.toWalletId] !== undefined) {
+          finalBalances[oldData.toWalletId] -= oldData.amount;
+        }
+      } else {
+        if (oldData.walletId && finalBalances[oldData.walletId] !== undefined) {
+          finalBalances[oldData.walletId] += (oldData.type === 'income' ? -oldData.amount : oldData.amount);
+        }
+      }
+
+      // 2. ใส่ผลกระทบใหม่ (Apply new impact)
+      if (updatedData.type === 'transfer') {
+        if (updatedData.fromWalletId && finalBalances[updatedData.fromWalletId] !== undefined) {
+          finalBalances[updatedData.fromWalletId] -= updatedData.amount;
+        }
+        if (updatedData.toWalletId && finalBalances[updatedData.toWalletId] !== undefined) {
+          finalBalances[updatedData.toWalletId] += updatedData.amount;
+        }
+      } else {
+        if (updatedData.walletId && finalBalances[updatedData.walletId] !== undefined) {
+          finalBalances[updatedData.walletId] += (updatedData.type === 'income' ? updatedData.amount : -updatedData.amount);
+        }
+      }
+
+      // 3. อัปเดต Wallets ที่ยอดเปลี่ยน
+      for (const id in finalBalances) {
+        if (finalBalances[id] !== walletSnaps[id]) {
+          transaction.update(walletRefs[id], { balance: finalBalances[id] });
+        }
+      }
+
+      // 4. อัปเดต Transaction Record
+      const txUpdate = { ...newData };
+      if (updatedData.type === 'transfer' && updatedData.fromWalletId) {
+        txUpdate.walletId = updatedData.fromWalletId;
+      }
+      transaction.update(txRef, txUpdate);
+    });
+  } catch (error) {
+    console.error("Update transaction failed: ", error);
+    throw error;
+  }
+};
+
+/**
  * Helper สำหรับจัดกลุ่มรายการตามวันที่
  */
 export const groupTransactions = (docs: any[], search?: string): GroupedTransactions => {
