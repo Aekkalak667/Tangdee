@@ -15,3 +15,7 @@
 | 2026-04-21 | Page Transitions | Framer Motion (Apple Card Reveal) | เลือกใช้ `template.tsx` คู่กับ `cubic-bezier(0.22, 1, 0.36, 1)` เพื่อความนุ่มนวลแบบ iOS และเร่งด้วย GPU (`will-change`) |
 | 2026-04-24 | Action Menu UI | Bottom Sheet (Slide-up) | ใช้ Bottom Sheet แทนเมนู Dropdown เพื่อให้เข้าถึงปุ่มลบ/แก้ไขได้ง่ายขึ้นด้วยนิ้วโป้งบนมือถือ และให้ความรู้สึกพรีเมียม |
 | 2026-04-24 | Data Integrity | Inverse Transaction Logic | ในการแก้ไข/ลบรายการ จะใช้วิธีล้างผลกระทบเดิม (Reverse) ก่อนใส่ค่าใหม่ เพื่อลดความซับซ้อนของ Logic และเพิ่มความแม่นยำของยอดเงิน |
+| 2026-04-25 | Custom Categories | User-specific Firestore Collection | แยกเก็บหมวดหมู่ที่ผู้ใช้สร้างเองใน `users/{uid}/categories` เพื่อความเป็นส่วนตัว และลดภาระการโหลดข้อมูลส่วนกลางที่ไม่จำเป็น |
+| 2026-04-25 | UI Architecture | React Portals for Overlays | ใช้ Portal เรนเดอร์ Bottom Sheets ที่ระดับ `body` เพื่อแก้ปัญหา Z-index และการถูกตัดขอบ (Clipping) จาก CSS parent containers |
+| 2026-04-25 | UX Strategy | Note-First Display | ปรับลำดับความสำคัญการแสดงผลในรายการธุรกรรม โดยใช้ Note เป็นหัวข้อหลักแทนชื่อหมวดหมู่ เพื่อให้ผู้ใช้จดจำสิ่งที่ทำได้รวดเร็วขึ้น |
+| 2026-04-25 | Data Persistence | Icon Name Embedding | บันทึกชื่อไอคอนลงในแต่ละ Transaction โดยตรง เพื่อให้การแสดงผลประวัติคงเดิมแม้หมวดหมู่ต้นทางจะถูกลบหรือแก้ไขในภายหลัง |

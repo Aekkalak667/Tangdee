@@ -45,9 +45,14 @@
       "utilities": "บ้าน/บิล",
       "lifestyle": "สไลต์",
       "health": "สุขภาพ",
-      "income": "รายรับ"
+      "income": "รายรับ",
+      "custom": "กำหนดเอง"
     },
     "categories": {
+      "add_custom": "เพิ่มหมวดหมู่ใหม่",
+      "name_label": "ชื่อหมวดหมู่",
+      "name_placeholder": "เช่น ทำบุญ, ของเล่น",
+      "select_icon": "เลือกไอคอน",
       "cat_food": "อาหาร",
       "cat_coffee": "กาแฟ",
       "cat_drinks": "เครื่องดื่ม",

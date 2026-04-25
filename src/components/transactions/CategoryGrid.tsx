@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { categories, CATEGORY_GROUPS } from '@/constants/categories';
+import { Plus } from 'lucide-react';
+import { categories as staticCategories, CATEGORY_GROUPS, Category } from '@/constants/categories';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
+import { subscribeToCustomCategories, CustomCategory } from '@/services/categoryService';
+import AddCategorySheet from './AddCategorySheet';
 import styles from './CategoryGrid.module.css';
 
 interface CategoryGridProps {
@@ -14,14 +18,32 @@ interface CategoryGridProps {
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({ activeCategoryId, onSelect, type }) => {
   const { t } = useLanguage();
-  const filteredCategories = categories.filter(c => c.type === type);
+  const { user } = useAuth();
+  const [customCategories, setCustomCategories] = useState<CustomCategory[]>([]);
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = subscribeToCustomCategories(user.uid, (data) => {
+      setCustomCategories(data);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  const allCategories = useMemo(() => {
+    return [...staticCategories, ...customCategories];
+  }, [customCategories]);
+
+  const filteredCategories = allCategories.filter(c => c.type === type);
   const groups = Array.from(new Set(filteredCategories.map(c => c.group)));
   const [activeGroup, setActiveGroup] = useState(groups[0]);
 
-  // Sync active group when type changes (e.g. from expense to income)
+  // Sync active group when type changes
   useEffect(() => {
-    setActiveGroup(groups[0]);
-  }, [type]);
+    if (!groups.includes(activeGroup)) {
+      setActiveGroup(groups[0]);
+    }
+  }, [type, groups, activeGroup]);
 
   const visibleCategories = filteredCategories.filter(c => c.group === activeGroup);
 
@@ -42,6 +64,10 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ activeCategoryId, onSelect,
       <div className={styles.grid}>
         {visibleCategories.map(category => {
           const Icon = (LucideIcons as any)[category.iconName] || LucideIcons.HelpCircle;
+          const label = category.isCustom 
+            ? category.name 
+            : t(`dashboard.categories.${category.labelKey}`);
+
           return (
             <div
               key={category.id}
@@ -51,11 +77,35 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ activeCategoryId, onSelect,
               <div className={styles.iconCircle}>
                 <Icon size={24} strokeWidth={1.5} />
               </div>
-              <span className={styles.label}>{t(`dashboard.categories.${category.labelKey}`)}</span>
+              <span className={styles.label}>{label}</span>
             </div>
           );
         })}
+
+        {/* Add Category Button */}
+        <div 
+          className={`${styles.item} ${styles.addItem}`}
+          onClick={() => setIsAddSheetOpen(true)}
+        >
+          <div className={styles.iconCircle}>
+            <Plus size={24} strokeWidth={1.5} />
+          </div>
+          <span className={styles.label}>{t('common.manage')}</span>
+        </div>
       </div>
+
+      {user && (
+        <AddCategorySheet 
+          isOpen={isAddSheetOpen}
+          onClose={() => setIsAddSheetOpen(false)}
+          uid={user.uid}
+          type={type}
+          onSuccess={(id) => {
+            setActiveGroup(CATEGORY_GROUPS.CUSTOM);
+            onSelect(id);
+          }}
+        />
+      )}
     </div>
   );
 };

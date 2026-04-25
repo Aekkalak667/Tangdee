@@ -7,6 +7,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useWallet } from '@/context/WalletContext';
 import { subscribeToWallets, WalletData } from '@/services/walletService';
 import { addTransactionWithUpdate, transferFunds } from '@/services/transactionService';
+import { subscribeToCustomCategories, CustomCategory } from '@/services/categoryService';
+import { categories as staticCategories } from '@/constants/categories';
 import TypeToggle from '@/components/transactions/TypeToggle';
 import CategoryGrid from '@/components/transactions/CategoryGrid';
 import { WALLET_ICONS } from '@/components/wallet/WalletForm';
@@ -26,6 +28,7 @@ export default function AddTransactionPage() {
   const [toWalletId, setToWalletId] = useState('');
   const [note, setNote] = useState('');
   const [wallets, setWallets] = useState<WalletData[]>([]);
+  const [customCategories, setCustomCategories] = useState<CustomCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showWalletMenu, setShowWalletMenu] = useState<'from' | 'to' | null>(null);
 
@@ -34,7 +37,7 @@ export default function AddTransactionPage() {
 
   useEffect(() => {
     if (!user) return;
-    const unsubscribe = subscribeToWallets(user.uid, (updatedWallets) => {
+    const unsubWallets = subscribeToWallets(user.uid, (updatedWallets) => {
       setWallets(updatedWallets);
       if (!walletId && updatedWallets.length > 0) {
         setWalletId(updatedWallets[0].id || '');
@@ -44,7 +47,15 @@ export default function AddTransactionPage() {
         if (other) setToWalletId(other.id || '');
       }
     });
-    return () => unsubscribe();
+
+    const unsubCats = subscribeToCustomCategories(user.uid, (cats) => {
+      setCustomCategories(cats);
+    });
+
+    return () => {
+      unsubWallets();
+      unsubCats();
+    };
   }, [user, walletId, toWalletId]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,16 +76,32 @@ export default function AddTransactionPage() {
 
     setIsLoading(true);
     try {
-      const categoryName = t(`dashboard.categories.cat_${categoryId}`);
+      // Find category name and icon
+      let categoryName = '';
+      let iconName = '';
+      
+      const customCat = customCategories.find(c => c.id === categoryId);
+      if (customCat) {
+        categoryName = customCat.name;
+        iconName = customCat.iconName;
+      } else {
+        const staticCat = staticCategories.find(c => c.id === categoryId);
+        if (staticCat) {
+          categoryName = t(`dashboard.categories.${staticCat.labelKey}`);
+          iconName = staticCat.iconName;
+        }
+      }
+
       const txData = {
         uid: user.uid,
         amount: numericAmount,
         type,
         categoryId,
+        iconName,
         walletId,
         note,
         name: categoryName || categoryId,
-        category: categoryId,
+        category: categoryName || categoryId,
       };
 
       if (type === 'transfer') {

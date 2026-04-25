@@ -234,8 +234,10 @@ const TransactionsPage = () => {
                       key={tx.id}
                       name={tx.name}
                       category={tx.categoryId || tx.category}
+                      iconName={tx.iconName}
                       amount={tx.amount}
                       type={tx.type}
+                      note={tx.note}
                       time={tx.date?.toDate ? tx.date.toDate().toLocaleTimeString(language === 'th' ? 'th-TH' : 'en-US', {
                         hour: '2-digit',
                         minute: '2-digit',

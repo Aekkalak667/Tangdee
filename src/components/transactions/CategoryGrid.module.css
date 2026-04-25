@@ -90,6 +90,18 @@
   font-weight: 600;
 }
 
+.addItem .iconCircle {
+  border: 1px dashed var(--gray-200);
+  background: transparent;
+  color: var(--gray-400);
+}
+
+.addItem:hover .iconCircle {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: rgba(var(--primary-color-rgb), 0.05);
+}
+
 @media (max-width: 380px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);

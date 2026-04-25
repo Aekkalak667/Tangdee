@@ -23,6 +23,7 @@ export interface Transaction {
   type: 'income' | 'expense' | 'transfer';
   category: string;
   categoryId: string;
+  iconName?: string; // Icon for the category
   name: string;
   walletId: string;
   fromWalletId?: string;

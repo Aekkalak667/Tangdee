@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -25,12 +26,18 @@ const TransactionActionSheet: React.FC<TransactionActionSheetProps> = ({
   transaction,
 }) => {
   const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   if (!transaction) return null;
 
   // Find category data
   const categoryData = categories.find((c) => c.id === transaction.categoryId);
-  const iconName = categoryData?.iconName || (transaction.type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
+  const iconName = transaction.iconName || categoryData?.iconName || (transaction.type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
   const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;
 
   const formattedAmount = new Intl.NumberFormat('th-TH', {
@@ -39,7 +46,7 @@ const TransactionActionSheet: React.FC<TransactionActionSheetProps> = ({
     signDisplay: 'always',
   }).format(transaction.type === 'expense' ? -transaction.amount : transaction.amount);
 
-  return (
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <div className={styles.container}>
@@ -63,7 +70,10 @@ const TransactionActionSheet: React.FC<TransactionActionSheetProps> = ({
                 <IconComponent size={32} strokeWidth={2.5} />
               </div>
               <div className={styles.info}>
-                <span className={styles.name}>{transaction.name}</span>
+                <span className={styles.name}>{transaction.note || transaction.name}</span>
+                {transaction.note && (
+                  <span className={styles.categorySub}>{transaction.name}</span>
+                )}
                 <span className={`${styles.amount} ${styles[transaction.type]}`}>
                   {formattedAmount}
                 </span>
@@ -102,6 +112,10 @@ const TransactionActionSheet: React.FC<TransactionActionSheetProps> = ({
       )}
     </AnimatePresence>
   );
+
+  if (!mounted) return null;
+
+  return createPortal(content, document.body);
 };
 
 export default TransactionActionSheet;

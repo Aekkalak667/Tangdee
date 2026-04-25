@@ -45,9 +45,14 @@
       "utilities": "Utilities",
       "lifestyle": "Lifestyle",
       "health": "Health",
-      "income": "Income"
+      "income": "Income",
+      "custom": "Custom"
     },
     "categories": {
+      "add_custom": "Add Custom Category",
+      "name_label": "Category Name",
+      "name_placeholder": "e.g., Charity, Toys",
+      "select_icon": "Select Icon",
       "cat_food": "Food",
       "cat_coffee": "Coffee",
       "cat_drinks": "Drinks",

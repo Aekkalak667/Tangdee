@@ -1,6 +1,6 @@
 # 🟢 โปรเจกต์: ตังค์ดี (Tang Dee)
 
-## 📋 สถานะปัจจุบัน (2026-04-24)
+## 📋 สถานะปัจจุบัน (2026-04-25)
 - **Framework:** Next.js (App Router) + TypeScript
 - **Styling:** Vanilla CSS (CSS Modules) - Minimalism Style
 - **Backend:** Firebase (Auth, Firestore)
@@ -9,7 +9,7 @@
 ## 🏗️ สถาปัตยกรรม (Architectural Decisions)
 1. **The "Seamless Card" Pattern:** ใช้ State กลางเพื่อทำ Live Preview ระหว่างกรอกฟอร์มสร้างกระเป๋าเงิน
 2. **Auth Integration:** ใช้ React Context (`AuthContext`) หุ้มทั้งแอพเพื่อจัดการ Google Login
-3. **Data Isolation:** เก็บข้อมูลกระเป๋าเงินไว้ใน `users/{uid}/wallets` เพื่อความปลอดภัย
+3. **Data Isolation:** เก็บข้อมูลกระเป๋าเงินและหมวดหมู่ไว้ใน `users/{uid}/wallets` และ `users/{uid}/categories` เพื่อความปลอดภัยและความเป็นส่วนตัว
 
 ## ✅ ฟีเจอร์ที่เสร็จแล้ว
 - [x] ระบบ Login ด้วย Google
@@ -24,6 +24,7 @@
 - [x] ระบบ Pagination & Infinite Scroll สำหรับประวัติธุรกรรม
 - [x] ยกระดับ UI/UX: PWA Standalone (iOS), Global Page Transitions (Framer Motion), App Loader พรีเมียม, และหน้า About Us
 - [x] ระบบ ลบ และ แก้ไข รายการ (Transaction Management) พร้อมระบบ Action Bottom Sheet พรีเมียม
+- [x] ระบบ หมวดหมู่กำหนดเอง (Custom Category) พร้อม Icon Picker และระบบแสดงผล Note-first
 
 ## 📝 บันทึกเอเจนต์ (Maestro Log)
 - สำเร็จภารกิจสร้างฐานแอพใน 5 เฟสย่อย
@@ -35,4 +36,8 @@
     - เพิ่มฟังก์ชัน `deleteTransactionWithUpdate` และ `updateTransactionWithUpdate` แบบ Atomic
     - สร้าง `TransactionActionSheet` (Bottom Sheet) สไตล์ Apple ด้วย Framer Motion
     - สร้างหน้าแก้ไขรายการ (Edit Page) ที่ดึงข้อมูล Real-time และอัปเดตยอดเงินในกระเป๋าอัตโนมัติ
+- **2026-04-25:** ระบบ Custom Categories และ UI Refinement
+    - พัฒนา `categoryService` และ `AddCategorySheet` สำหรับจัดการหมวดหมู่รายบุคคล
+    - ปรับปรุง `TransactionItem` ให้แสดง Note เป็นหัวข้อหลักเพื่อความชัดเจน
+    - แก้ไขปัญหา UI Overlap โดยใช้ React Portals และปรับปรุง High-contrast Icon Picker
 - **TechLead Mandate:** คงความเป็น Minimalism และ Real-time ตลอดการพัฒนา

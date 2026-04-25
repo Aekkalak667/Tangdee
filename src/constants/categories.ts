@@ -6,6 +6,8 @@ export interface Category {
   group: string;
   labelKey: string;
   iconName: string;
+  isCustom?: boolean;
+  name?: string; // For custom categories
 }
 
 export const CATEGORY_GROUPS = {
@@ -15,6 +17,7 @@ export const CATEGORY_GROUPS = {
   LIFESTYLE: 'lifestyle',
   HEALTH: 'health',
   INCOME: 'income',
+  CUSTOM: 'custom',
 };
 
 export const categories: Category[] = [

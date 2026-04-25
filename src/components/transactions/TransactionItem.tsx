@@ -3,15 +3,17 @@
 import React from "react";
 import * as LucideIcons from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { categories } from "@/constants/categories";
+import { categories as staticCategories } from "@/constants/categories";
 import styles from "./TransactionItem.module.css";
 
 interface TransactionItemProps {
   name: string;
   category: string; // The ID of the category
+  iconName?: string; // Optional icon name from transaction record
   amount: number;
   type: "income" | "expense" | "transfer";
   time?: string;
+  note?: string; // Optional note
   showSeparator?: boolean;
   onClick?: () => void;
 }
@@ -19,18 +21,28 @@ interface TransactionItemProps {
 const TransactionItem: React.FC<TransactionItemProps> = ({
   name,
   category,
+  iconName: txIconName,
   amount,
   type,
   time,
+  note,
   showSeparator = true,
   onClick,
 }) => {
   const { t } = useLanguage();
   
   // Find category data from central library
-  const categoryData = categories.find(c => c.id === category);
-  const iconName = categoryData?.iconName || (type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
+  const categoryData = staticCategories.find(c => c.id === category);
+  
+  // Determine icon: Transaction Record Icon > Static Category Icon > Fallback
+  const iconName = txIconName || categoryData?.iconName || (type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
+  
+  // Determine category label: Static Category Label > Fallback to ID/Name
   const categoryLabel = categoryData ? t(`dashboard.categories.${categoryData.labelKey}`) : category;
+
+  // Logic to handle Title and Subtitle to avoid redundancy and show notes
+  const displayTitle = note || name;
+  const showCategoryInSub = note || (name !== categoryLabel && name !== category);
 
   // Dynamically get the icon component
   const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;
@@ -49,15 +61,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         </div>
         
         <div className={styles.content}>
-          <span className={styles.name}>{name}</span>
+          <span className={styles.name}>{displayTitle}</span>
           <div className={styles.details}>
-            <span>{categoryLabel}</span>
-            {time && (
-              <>
-                <span>•</span>
-                <span>{time}</span>
-              </>
-            )}
+            {showCategoryInSub && <span>{categoryLabel}</span>}
+            {showCategoryInSub && time && <span>•</span>}
+            {time && <span>{time}</span>}
           </div>
         </div>
 
