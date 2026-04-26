@@ -37,12 +37,12 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   // Determine icon: Transaction Record Icon > Static Category Icon > Fallback
   const iconName = txIconName || categoryData?.iconName || (type === 'transfer' ? 'ArrowLeftRight' : 'CircleDollarSign');
   
-  // Determine category label: Static Category Label > Fallback to ID/Name
-  const categoryLabel = categoryData ? t(`dashboard.categories.${categoryData.labelKey}`) : category;
+  // Determine category label: Static Category Label > Fallback to name prop (readable name)
+  const categoryLabel = categoryData ? t(`dashboard.categories.${categoryData.labelKey}`) : name;
 
   // Logic to handle Title and Subtitle to avoid redundancy and show notes
-  const displayTitle = note || name;
-  const showCategoryInSub = note || (name !== categoryLabel && name !== category);
+  const displayTitle = note || categoryLabel;
+  const showCategoryInSub = !!(note && note !== categoryLabel);
 
   // Dynamically get the icon component
   const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;

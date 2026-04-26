@@ -41,3 +41,10 @@
 - **Issue:** ปุ่ม "ยกเลิก" ใน TransactionActionSheet โดนแถบ Bottom Nav บัง ทำให้กดยากหรือมองไม่เห็น
 - **Root Cause:** Padding-bottom ของ Bottom Sheet ไม่เพียงพอที่จะดันเนื้อหาขึ้นมาเหนือแถบเมนูที่ลอยอยู่ (Floating Nav)
 - **Fix:** เพิ่ม `padding-bottom: 8rem` ให้กับ `.sheet` ในไฟล์ `TransactionActionSheet.module.css` เพื่อให้เนื้อหาทั้งหมดลอยพ้นแถบนำทางหลัก
+
+### 9. Custom Category ID Display & Note Priority
+- **Issue:** รายการธุรกรรมแสดงรหัส ID (เช่น "6TAfp...") แทนที่จะเป็นชื่อหมวดหมู่ที่ผู้ใช้ตั้งไว้ และลำดับความสำคัญของ Note ไม่ชัดเจน
+- **Root Cause:** คอมโพเนนต์ `TransactionItem` ดึงค่าจาก ID โดยตรง และหน้าแก้ไขรายการ (Edit Page) บันทึกค่า ID ลงในฟิลด์ชื่อโดยไม่ได้แปลงเป็นชื่อที่อ่านออก
+- **Fix:** 
+    1. ปรับ `TransactionItem` ให้ดึงชื่อหมวดหมู่มาแสดงเป็น Default และมีระบบ "Note-first" (ถ้ามี Note ให้โชว์ Note เป็นหัวข้อหลัก ถ้าไม่มีให้โชว์ชื่อหมวดหมู่)
+    2. แก้ไข `EditTransactionPage` ให้ดึงข้อมูลหมวดหมู่มาเทียบเพื่อหาชื่อ (Name) และไอคอน (Icon) ที่ถูกต้องก่อนบันทึกลง Firestore เพื่อความคงเส้นคงวากับหน้าเพิ่มรายการ

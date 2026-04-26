@@ -8,6 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { subscribeToWallets, WalletData } from '@/services/walletService';
 import { updateTransactionWithUpdate, Transaction } from '@/services/transactionService';
+import { subscribeToCustomCategories, CustomCategory } from '@/services/categoryService';
+import { categories as staticCategories } from '@/constants/categories';
 import TypeToggle from '@/components/transactions/TypeToggle';
 import CategoryGrid from '@/components/transactions/CategoryGrid';
 import { WALLET_ICONS } from '@/components/wallet/WalletForm';
@@ -31,6 +33,7 @@ export default function EditTransactionPage({ params }: EditTransactionPageProps
   const [toWalletId, setToWalletId] = useState('');
   const [note, setNote] = useState('');
   const [wallets, setWallets] = useState<WalletData[]>([]);
+  const [customCategories, setCustomCategories] = useState<CustomCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showWalletMenu, setShowWalletMenu] = useState<'from' | 'to' | null>(null);
@@ -38,13 +41,21 @@ export default function EditTransactionPage({ params }: EditTransactionPageProps
   const selectedWallet = wallets.find(w => w.id === walletId);
   const destinationWallet = wallets.find(w => w.id === toWalletId);
 
-  // Fetch Wallets
+  // Fetch Wallets & Categories
   useEffect(() => {
     if (!user) return;
-    const unsubscribe = subscribeToWallets(user.uid, (updatedWallets) => {
+    const unsubWallets = subscribeToWallets(user.uid, (updatedWallets) => {
       setWallets(updatedWallets);
     });
-    return () => unsubscribe();
+
+    const unsubCats = subscribeToCustomCategories(user.uid, (cats) => {
+      setCustomCategories(cats);
+    });
+
+    return () => {
+      unsubWallets();
+      unsubCats();
+    };
   }, [user]);
 
   // Fetch Transaction Data
@@ -98,7 +109,26 @@ export default function EditTransactionPage({ params }: EditTransactionPageProps
 
     setIsSaving(true);
     try {
-      const categoryName = t(`dashboard.categories.cat_${categoryId}`);
+      let categoryName = '';
+      let iconName = '';
+
+      if (type === 'transfer') {
+        categoryName = 'Transfer';
+        iconName = 'ArrowLeftRight';
+      } else {
+        const customCat = customCategories.find(c => c.id === categoryId);
+        if (customCat) {
+          categoryName = customCat.name;
+          iconName = customCat.iconName;
+        } else {
+          const staticCat = staticCategories.find(c => c.id === categoryId);
+          if (staticCat) {
+            categoryName = t(`dashboard.categories.${staticCat.labelKey}`);
+            iconName = staticCat.iconName;
+          }
+        }
+      }
+
       const txData: Partial<Transaction> = {
         amount: numericAmount,
         type,
@@ -106,13 +136,15 @@ export default function EditTransactionPage({ params }: EditTransactionPageProps
         walletId,
         note,
         name: categoryName || categoryId,
-        category: categoryId,
+        category: categoryName || categoryId,
+        iconName,
       };
 
       if (type === 'transfer') {
         txData.fromWalletId = walletId;
         txData.toWalletId = toWalletId;
         txData.walletId = walletId;
+        txData.name = `โอนย้ายไปยัง ${destinationWallet?.name || '...'}`;
       }
 
       await updateTransactionWithUpdate(user.uid, id, txData);
